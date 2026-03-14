@@ -44,7 +44,7 @@ Update your API service to use environment variables for the baseURL.
     *   **Output Directory**: `dist`
 5.  **Environment Variables**:
     Expand the **Environment Variables** section and add:
-    *   `VITE_API_BASE_URL`: `https://your-render-api-url.onrender.com` (Copy this from your Render dashboard after deployment)
+    *   `VITE_API_BASE_URL`: `https://sliq-wgrq.onrender.com`
 6.  Click **Deploy**.
 
 ---
