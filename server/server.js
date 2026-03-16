@@ -28,7 +28,8 @@ app.use(express.json());
 // Rate Limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100
+  max: 500, // Increased for modern SPA usage
+  message: 'Too many requests from this IP, please try again after 15 minutes'
 });
 app.use('/api/', limiter);
 
