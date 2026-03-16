@@ -26,7 +26,7 @@ const createTask = async (req, res) => {
       title,
       description,
       projectId,
-      assignee,
+      assignee: assignee || null,
       priority,
       dueDate,
       createdBy: req.user._id,
@@ -35,7 +35,7 @@ const createTask = async (req, res) => {
 
     // Create notification for assignee
     if (assignee && assignee.toString() !== req.user._id.toString()) {
-      await Notification.create({
+      const notification = await Notification.create({
         userId: assignee,
         type: 'task_assigned',
         message: `You have been assigned a new task: ${title}`,
@@ -127,7 +127,7 @@ const updateTask = async (req, res) => {
     task.description = description || task.description;
     task.status = status || task.status;
     task.priority = priority || task.priority;
-    task.assignee = assignee || task.assignee;
+    task.assignee = assignee === "" ? null : (assignee || task.assignee);
     task.dueDate = dueDate || task.dueDate;
 
     const updatedTask = await task.save();
