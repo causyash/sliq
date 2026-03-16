@@ -203,13 +203,42 @@ const TaskModal = ({ task, onClose, onUpdate, onDelete }) => {
               <div className="space-y-2">
                 <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Quick Actions</label>
                 <div className="space-y-2">
-                  <button 
-                    onClick={() => handleStatusChange('done')}
-                    className="w-full flex items-center gap-2 px-4 py-2 bg-emerald-50 text-emerald-700 rounded-xl text-xs font-bold hover:bg-emerald-100 transition-colors"
-                  >
-                    <Tag size={14} />
-                    Mark as Done
-                  </button>
+                  {task.status !== 'todo' && (
+                    <button 
+                      onClick={() => handleStatusChange('todo')}
+                      className="w-full flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-xl text-xs font-bold hover:bg-gray-200 transition-colors"
+                    >
+                      <Tag size={14} />
+                      Set to To Do
+                    </button>
+                  )}
+                  {task.status !== 'in_progress' && (
+                    <button 
+                      onClick={() => handleStatusChange('in_progress')}
+                      className="w-full flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 rounded-xl text-xs font-bold hover:bg-blue-100 transition-colors"
+                    >
+                      <Tag size={14} />
+                      Mark In Progress
+                    </button>
+                  )}
+                  {task.status !== 'review' && (
+                    <button 
+                      onClick={() => handleStatusChange('review')}
+                      className="w-full flex items-center gap-2 px-4 py-2 bg-amber-50 text-amber-700 rounded-xl text-xs font-bold hover:bg-amber-100 transition-colors"
+                    >
+                      <Tag size={14} />
+                      Move to Review
+                    </button>
+                  )}
+                  {task.status !== 'done' && (
+                    <button 
+                      onClick={() => handleStatusChange('done')}
+                      className="w-full flex items-center gap-2 px-4 py-2 bg-emerald-50 text-emerald-700 rounded-xl text-xs font-bold hover:bg-emerald-100 transition-colors"
+                    >
+                      <Tag size={14} />
+                      Mark as Done
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
