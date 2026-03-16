@@ -16,7 +16,7 @@ const createTask = async (req, res) => {
     }
 
     // Check if user is member of project
-    if (!project.members.includes(req.user._id)) {
+    if (!project.members.some(m => m.toString() === req.user._id.toString())) {
       return res.status(403).json({ message: 'Not authorized to create tasks in this project' });
     }
 
@@ -71,7 +71,7 @@ const getProjectTasks = async (req, res) => {
     }
 
     // Check if user is member
-    if (!project.members.includes(req.user._id)) {
+    if (!project.members.some(m => m.toString() === req.user._id.toString())) {
       return res.status(403).json({ message: 'Not authorized to access tasks in this project' });
     }
 

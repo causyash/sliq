@@ -14,7 +14,7 @@ const createProject = async (req, res) => {
     }
 
     // Check if user is member of workspace
-    if (!workspace.members.includes(req.user._id)) {
+    if (!workspace.members.some(m => m.toString() === req.user._id.toString())) {
       return res.status(403).json({ message: 'Not authorized to create project in this workspace' });
     }
 
@@ -58,7 +58,7 @@ const getProjectsByWorkspace = async (req, res) => {
     }
 
     // Check if user is member
-    if (!workspace.members.includes(req.user._id)) {
+    if (!workspace.members.some(m => m.toString() === req.user._id.toString())) {
       return res.status(403).json({ message: 'Not authorized to access this workspace' });
     }
 
@@ -87,8 +87,8 @@ const getProjectById = async (req, res) => {
     }
 
     // Check if user is member of the parent workspace
-    const workspace = await Workspace.findById(project.workspaceId);
-    if (!workspace.members.includes(req.user._id)) {
+    const workspace = await Workspace.findById(project.workspaceId._id);
+    if (!workspace || !workspace.members.some(m => m.toString() === req.user._id.toString())) {
       return res.status(403).json({ message: 'Not authorized to access this project' });
     }
 

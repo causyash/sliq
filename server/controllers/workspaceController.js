@@ -87,7 +87,7 @@ const inviteToWorkspace = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    if (workspace.members.includes(userToInvite._id)) {
+    if (workspace.members.some(m => m.toString() === userToInvite._id.toString())) {
       return res.status(400).json({ message: 'User is already a member' });
     }
 
