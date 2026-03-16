@@ -26,7 +26,14 @@ const createWorkspace = async (req, res) => {
 // @access  Private
 const getWorkspaces = async (req, res) => {
   try {
-    const workspaces = await Workspace.find({ members: req.user._id })
+    let query = { members: req.user._id };
+    
+    // Admin gets to see everything
+    if (req.user.role === 'admin') {
+      query = {};
+    }
+
+    const workspaces = await Workspace.find(query)
       .populate('owner', 'name email avatar')
       .sort({ createdAt: -1 });
 

@@ -57,8 +57,8 @@ const getProjectsByWorkspace = async (req, res) => {
       return res.status(404).json({ message: 'Workspace not found' });
     }
 
-    // Check if user is member
-    if (!workspace.members.some(m => m.toString() === req.user._id.toString())) {
+    // Check if user is member (Admin bypasses)
+    if (req.user.role !== 'admin' && !workspace.members.some(m => m.toString() === req.user._id.toString())) {
       return res.status(403).json({ message: 'Not authorized to access this workspace' });
     }
 
@@ -86,9 +86,11 @@ const getProjectById = async (req, res) => {
       return res.status(404).json({ message: 'Project not found' });
     }
 
-    // Check if user is member of the parent workspace
+    // Check if user is member of the parent workspace (Admin bypasses)
     const workspace = await Workspace.findById(project.workspaceId._id);
-    if (!workspace || !workspace.members.some(m => m.toString() === req.user._id.toString())) {
+    if (!workspace) return res.status(404).json({ message: 'Workspace not found' });
+
+    if (req.user.role !== 'admin' && !workspace.members.some(m => m.toString() === req.user._id.toString())) {
       return res.status(403).json({ message: 'Not authorized to access this project' });
     }
 
@@ -152,11 +154,32 @@ const deleteProject = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+// @desc    Get all projects (Admin only)
+// @route   GET /api/projects/admin/all
+// @access  Private/Admin
+const getAllProjectsWithWorkspaces = async (req, res) => {
+  try {
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Admin access only' });
+    }
+
+    const projects = await Project.find()
+      .populate('workspaceId', 'name')
+      .populate('members', 'name email avatar role')
+      .populate('createdBy', 'name email')
+      .sort({ createdAt: -1 });
+
+    res.json(projects);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 
 module.exports = {
   createProject,
   getProjectsByWorkspace,
   getProjectById,
   updateProject,
-  deleteProject
+  deleteProject,
+  getAllProjectsWithWorkspaces
 };

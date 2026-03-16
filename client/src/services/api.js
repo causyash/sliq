@@ -19,6 +19,7 @@ export const authAPI = {
   login: (data) => API.post('/auth/login', data),
   signup: (data) => API.post('/auth/signup', data),
   getMe: () => API.get('/auth/me'),
+  getUsers: () => API.get('/auth/users'),
 };
 
 export const workspaceAPI = {
@@ -34,6 +35,7 @@ export const projectAPI = {
   create: (data) => API.post('/projects', data),
   update: (id, data) => API.put(`/projects/${id}`, data),
   delete: (id) => API.delete(`/projects/${id}`),
+  adminGetAll: () => API.get('/projects/admin/all'),
 };
 
 export const taskAPI = {

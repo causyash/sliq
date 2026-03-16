@@ -5,7 +5,8 @@ const {
   getProjectsByWorkspace,
   getProjectById,
   updateProject,
-  deleteProject
+  deleteProject,
+  getAllProjectsWithWorkspaces
 } = require('../controllers/projectController');
 const { protect, authorize } = require('../middlewares/authMiddleware');
 
@@ -13,6 +14,7 @@ router.use(protect);
 
 router.post('/', authorize('admin', 'project_manager'), createProject);
 router.get('/workspace/:workspaceId', getProjectsByWorkspace);
+router.get('/admin/all', authorize('admin'), getAllProjectsWithWorkspaces);
 router.get('/:id', getProjectById);
 router.put('/:id', updateProject);
 router.delete('/:id', authorize('admin', 'project_manager'), deleteProject);
