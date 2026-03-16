@@ -53,6 +53,7 @@ export const commentAPI = {
 
 export const analyticsAPI = {
   getWorkspace: (id) => API.get(`/analytics/workspace/${id}`),
+  getGlobal: () => API.get('/analytics/global'),
 };
 
 export const notificationAPI = {

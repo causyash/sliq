@@ -16,6 +16,7 @@ const Sidebar = () => {
   const navItems = isAdmin 
     ? [
         { name: 'Admin Console', path: '/', icon: <LayoutDashboard size={20} /> },
+        { name: 'Analytics', path: '/admin/analytics', icon: <BarChart3 size={20} /> },
       ]
     : [
         { name: 'Dashboard', path: '/', icon: <LayoutDashboard size={20} /> },

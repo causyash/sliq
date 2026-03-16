@@ -5,10 +5,11 @@ import ProjectPage from './pages/ProjectPage';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import AnalyticsPage from './pages/AnalyticsPage';
+import AdminAnalyticsPage from './pages/AdminAnalyticsPage';
 import './App.css';
 
 // Protected Route component
-const ProtectedRoute = ({ children, userOnly = false }) => {
+const ProtectedRoute = ({ children, userOnly = false, adminOnly = false }) => {
   const userInfoStr = localStorage.getItem('userInfo');
   if (!userInfoStr) {
     return <Navigate to="/login" replace />;
@@ -19,6 +20,11 @@ const ProtectedRoute = ({ children, userOnly = false }) => {
 
   // If a route is user-only and an admin tries to access it, redirect to home (Admin Console)
   if (userOnly && isAdmin) {
+    return <Navigate to="/" replace />;
+  }
+
+  // If a route is admin-only and a non-admin tries to access it
+  if (adminOnly && !isAdmin) {
     return <Navigate to="/" replace />;
   }
 
@@ -53,6 +59,12 @@ function App() {
         <Route path="/analytics" element={
           <ProtectedRoute userOnly={true}>
             <AnalyticsPage />
+          </ProtectedRoute>
+        } />
+
+        <Route path="/admin/analytics" element={
+          <ProtectedRoute adminOnly={true}>
+            <AdminAnalyticsPage />
           </ProtectedRoute>
         } />
 

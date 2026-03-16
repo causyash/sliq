@@ -77,14 +77,14 @@ const AdminProjectList = () => {
             className="w-full pl-12 pr-6 py-3 bg-gray-50 border border-transparent rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-500/5 focus:bg-white focus:border-indigo-100 transition-all text-sm font-medium"
           />
         </div>
-        <div className="flex gap-4">
-          <div className="px-4 py-2 bg-indigo-50 rounded-xl border border-indigo-100 flex items-center gap-2">
+        <div className="flex flex-wrap gap-3 w-full md:w-auto">
+          <div className="flex-1 md:flex-none px-4 py-2.5 bg-indigo-50 rounded-xl border border-indigo-100 flex items-center justify-center md:justify-start gap-2 min-w-[140px]">
             <FolderKanban size={16} className="text-indigo-600" />
-            <span className="text-sm font-bold text-indigo-700">{projects.length} Total Projects</span>
+            <span className="text-sm font-bold text-indigo-700 whitespace-nowrap">{projects.length} Total Projects</span>
           </div>
-          <div className="px-4 py-2 bg-emerald-50 rounded-xl border border-emerald-100 flex items-center gap-2">
+          <div className="flex-1 md:flex-none px-4 py-2.5 bg-emerald-50 rounded-xl border border-emerald-100 flex items-center justify-center md:justify-start gap-2 min-w-[140px]">
             <Users size={16} className="text-emerald-600" />
-            <span className="text-sm font-bold text-emerald-700">{users.length} Total Users</span>
+            <span className="text-sm font-bold text-emerald-700 whitespace-nowrap">{users.length} Total Users</span>
           </div>
         </div>
       </div>
