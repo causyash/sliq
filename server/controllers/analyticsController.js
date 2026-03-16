@@ -14,7 +14,7 @@ const getWorkspaceAnalytics = async (req, res) => {
     if (!workspace) {
       return res.status(404).json({ message: 'Workspace not found' });
     }
-    if (!workspace.members.includes(req.user._id)) {
+    if (!workspace.members.some(m => m.toString() === req.user._id.toString())) {
       return res.status(403).json({ message: 'Access denied' });
     }
 

@@ -1,5 +1,7 @@
 const Comment = require('../models/Comment');
 const Notification = require('../models/Notification');
+const Project = require('../models/Project');
+const Task = require('../models/Task');
 const socket = require('../socket');
 const logActivity = require('../utils/activityLogger');
 
