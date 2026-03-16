@@ -8,11 +8,20 @@ import AnalyticsPage from './pages/AnalyticsPage';
 import './App.css';
 
 // Protected Route component
-const ProtectedRoute = ({ children }) => {
-  const userInfo = localStorage.getItem('userInfo');
-  if (!userInfo) {
+const ProtectedRoute = ({ children, userOnly = false }) => {
+  const userInfoStr = localStorage.getItem('userInfo');
+  if (!userInfoStr) {
     return <Navigate to="/login" replace />;
   }
+  
+  const userInfo = JSON.parse(userInfoStr);
+  const isAdmin = userInfo.role === 'admin';
+
+  // If a route is user-only and an admin tries to access it, redirect to home (Admin Console)
+  if (userOnly && isAdmin) {
+    return <Navigate to="/" replace />;
+  }
+
   return children;
 };
 
@@ -30,19 +39,19 @@ function App() {
         } />
         
         <Route path="/workspaces/:id" element={
-          <ProtectedRoute>
+          <ProtectedRoute userOnly={true}>
             <WorkspacePage />
           </ProtectedRoute>
         } />
         
         <Route path="/projects/:id" element={
-          <ProtectedRoute>
+          <ProtectedRoute userOnly={true}>
             <ProjectPage />
           </ProtectedRoute>
         } />
 
         <Route path="/analytics" element={
-          <ProtectedRoute>
+          <ProtectedRoute userOnly={true}>
             <AnalyticsPage />
           </ProtectedRoute>
         } />

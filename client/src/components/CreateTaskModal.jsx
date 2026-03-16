@@ -84,9 +84,11 @@ const CreateTaskModal = ({ projectId, workspaceId, initialStatus, onClose, onSuc
                   className="w-full px-5 py-3.5 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all text-sm font-bold text-gray-700"
                 >
                   <option value="">Unassigned</option>
-                  {members.map(member => (
-                    <option key={member._id} value={member._id}>{member.name}</option>
-                  ))}
+                  {members
+                    .filter(member => member.role === 'developer')
+                    .map(member => (
+                      <option key={member._id} value={member._id}>{member.name}</option>
+                    ))}
                 </select>
               </div>
 
