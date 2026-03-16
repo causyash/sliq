@@ -77,9 +77,10 @@ const getProjectTasks = async (req, res) => {
       return res.status(404).json({ message: 'Project not found' });
     }
 
-    // Check if user is member of project or the parent workspace
+    // Check if user is member of project or the parent workspace (Admin bypasses)
     const workspace = await Workspace.findById(project.workspaceId);
     if (
+      req.user.role !== 'admin' &&
       !project.members.some(m => m.toString() === req.user._id.toString()) &&
       (!workspace || !workspace.members.some(m => m.toString() === req.user._id.toString()))
     ) {

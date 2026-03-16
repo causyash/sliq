@@ -51,7 +51,7 @@ function App() {
         } />
         
         <Route path="/projects/:id" element={
-          <ProtectedRoute userOnly={true}>
+          <ProtectedRoute>
             <ProjectPage />
           </ProtectedRoute>
         } />

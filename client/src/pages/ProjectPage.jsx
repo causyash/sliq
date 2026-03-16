@@ -124,13 +124,23 @@ const ProjectPage = () => {
   return (
     <Layout>
       <div className="mb-8">
-        <Link 
-          to={`/workspaces/${project.workspaceId?._id}`}
-          className="inline-flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-indigo-600 mb-6 transition-colors"
-        >
-          <ChevronLeft size={16} />
-          Back to {project.workspaceId?.name || 'Workspace'}
-        </Link>
+        {JSON.parse(localStorage.getItem('userInfo') || '{}').role === 'admin' ? (
+          <Link 
+            to="/"
+            className="inline-flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-indigo-600 mb-6 transition-colors"
+          >
+            <ChevronLeft size={16} />
+            Back to Admin Console
+          </Link>
+        ) : (
+          <Link 
+            to={`/workspaces/${project.workspaceId?._id}`}
+            className="inline-flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-indigo-600 mb-6 transition-colors"
+          >
+            <ChevronLeft size={16} />
+            Back to {project.workspaceId?.name || 'Workspace'}
+          </Link>
+        )}
         
         <div className="flex items-start justify-between">
           <div>

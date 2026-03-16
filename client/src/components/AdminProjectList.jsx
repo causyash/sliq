@@ -9,10 +9,12 @@ import {
   Layout,
   Clock,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  Eye
 } from 'lucide-react';
 import { projectAPI, authAPI } from '../services/api';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Link } from 'react-router-dom';
 
 const AdminProjectList = () => {
   const [projects, setProjects] = useState([]);
@@ -102,7 +104,9 @@ const AdminProjectList = () => {
                 </div>
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <h3 className="text-xl font-black text-gray-900 leading-tight">{project.name}</h3>
+                    <Link to={`/projects/${project._id}`} className="hover:text-indigo-600 transition-colors">
+                      <h3 className="text-xl font-black text-gray-900 leading-tight">{project.name}</h3>
+                    </Link>
                     <span className="px-2 py-0.5 bg-indigo-50 text-indigo-600 text-[10px] font-black uppercase tracking-widest rounded-lg">
                       {project.workspaceId?.name || 'Global'}
                     </span>
@@ -142,6 +146,13 @@ const AdminProjectList = () => {
                     <UserPlus size={16} />
                     Assign Member
                   </button>
+                  <Link 
+                    to={`/projects/${project._id}`}
+                    className="flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-100 text-gray-600 rounded-xl text-xs font-black hover:bg-gray-50 transition-all shadow-sm active:scale-95"
+                  >
+                    <Eye size={16} className="text-indigo-600" />
+                    View Status
+                  </Link>
                   <button className="p-2.5 text-gray-300 hover:text-gray-900 hover:bg-gray-50 rounded-xl transition-all">
                     <MoreVertical size={20} />
                   </button>
