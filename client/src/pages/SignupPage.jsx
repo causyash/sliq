@@ -102,7 +102,6 @@ const SignupPage = () => {
               >
                 <option value="developer">Developer</option>
                 <option value="project_manager">Project Manager</option>
-                <option value="admin">Admin</option>
               </select>
             </div>
 
