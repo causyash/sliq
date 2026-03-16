@@ -2,6 +2,7 @@ const Comment = require('../models/Comment');
 const Notification = require('../models/Notification');
 const Project = require('../models/Project');
 const Task = require('../models/Task');
+const Workspace = require('../models/Workspace');
 const socket = require('../socket');
 const logActivity = require('../utils/activityLogger');
 
@@ -17,8 +18,12 @@ const createTask = async (req, res) => {
       return res.status(404).json({ message: 'Project not found' });
     }
 
-    // Check if user is member of project
-    if (!project.members.some(m => m.toString() === req.user._id.toString())) {
+    // Check if user is member of project or the parent workspace
+    const workspace = await Workspace.findById(project.workspaceId);
+    if (
+      !project.members.some(m => m.toString() === req.user._id.toString()) &&
+      (!workspace || !workspace.members.some(m => m.toString() === req.user._id.toString()))
+    ) {
       return res.status(403).json({ message: 'Not authorized to create tasks in this project' });
     }
 
@@ -72,8 +77,12 @@ const getProjectTasks = async (req, res) => {
       return res.status(404).json({ message: 'Project not found' });
     }
 
-    // Check if user is member
-    if (!project.members.some(m => m.toString() === req.user._id.toString())) {
+    // Check if user is member of project or the parent workspace
+    const workspace = await Workspace.findById(project.workspaceId);
+    if (
+      !project.members.some(m => m.toString() === req.user._id.toString()) &&
+      (!workspace || !workspace.members.some(m => m.toString() === req.user._id.toString()))
+    ) {
       return res.status(403).json({ message: 'Not authorized to access tasks in this project' });
     }
 
