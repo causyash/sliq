@@ -132,6 +132,13 @@ const updateTask = async (req, res) => {
     const oldStatus = task.status;
     const oldAssignee = task.assignee?.toString();
 
+    // Role-based Approval Workflow
+    if (status === 'done' && oldStatus !== 'done') {
+      if (req.user.role !== 'admin' && req.user.role !== 'project_manager') {
+        return res.status(403).json({ message: 'Only Project Managers or Admins can approve and mark tasks as done.' });
+      }
+    }
+
     task.title = title || task.title;
     task.description = description || task.description;
     task.status = status || task.status;

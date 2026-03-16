@@ -109,18 +109,26 @@ const KanbanBoard = ({ tasks, onTaskUpdate, onTaskClick, onAddTask }) => {
 
   const onDragEnd = (event) => {
     const { active, over } = event;
+    const userData = JSON.parse(localStorage.getItem('userInfo') || '{}');
+    const isPM = userData.role === 'admin' || userData.role === 'project_manager';
+
     if (!over) {
       setActiveTask(null);
       return;
     }
 
     const activeId = active.id;
-    const overId = over.id;
-
     const activeTaskData = active.data.current.task;
     const overStatus = over.data.current?.task?.status || over.id;
 
     if (activeTaskData.status !== overStatus) {
+      if (overStatus === 'done' && !isPM) {
+        alert("Only Project Managers can approve and mark tasks as done.");
+        // Force re-fetch by triggering a dummy update or trusting the parent's logic
+        onTaskUpdate(activeId, { status: activeTaskData.status }); 
+        setActiveTask(null);
+        return;
+      }
       onTaskUpdate(activeId, { status: overStatus });
     }
 

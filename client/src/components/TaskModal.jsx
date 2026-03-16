@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Send, User, Calendar, Tag, Trash2, Clock } from 'lucide-react';
+import { X, Send, User, Calendar, Tag, Trash2, Clock, CheckCircle2 } from 'lucide-react';
 import { taskAPI, commentAPI } from '../services/api';
 import socket from '../services/socket';
 
@@ -8,6 +8,7 @@ const TaskModal = ({ task, onClose, onUpdate, onDelete }) => {
   const [newComment, setNewComment] = useState('');
   const [loading, setLoading] = useState(false);
   const [commentLoading, setCommentLoading] = useState(false);
+  const userData = JSON.parse(localStorage.getItem('userInfo') || '{}');
 
   useEffect(() => {
     const fetchComments = async () => {
@@ -202,42 +203,63 @@ const TaskModal = ({ task, onClose, onUpdate, onDelete }) => {
 
               <div className="space-y-2">
                 <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Quick Actions</label>
-                <div className="space-y-2">
-                  {task.status !== 'todo' && (
-                    <button 
-                      onClick={() => handleStatusChange('todo')}
-                      className="w-full flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-xl text-xs font-bold hover:bg-gray-200 transition-colors"
-                    >
-                      <Tag size={14} />
-                      Set to To Do
-                    </button>
-                  )}
-                  {task.status !== 'in_progress' && (
+                <div className="space-y-3">
+                  {/* Common Actions */}
+                  {task.status === 'todo' && (
                     <button 
                       onClick={() => handleStatusChange('in_progress')}
                       className="w-full flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 rounded-xl text-xs font-bold hover:bg-blue-100 transition-colors"
                     >
-                      <Tag size={14} />
-                      Mark In Progress
+                      <Clock size={14} />
+                      Start Working
                     </button>
                   )}
-                  {task.status !== 'review' && (
+
+                  {task.status === 'in_progress' && (
                     <button 
                       onClick={() => handleStatusChange('review')}
-                      className="w-full flex items-center gap-2 px-4 py-2 bg-amber-50 text-amber-700 rounded-xl text-xs font-bold hover:bg-amber-100 transition-colors"
+                      className="w-full flex items-center gap-2 px-4 py-3 bg-amber-50 text-amber-700 rounded-xl text-xs font-black hover:bg-amber-100 transition-colors border border-amber-200/50"
                     >
-                      <Tag size={14} />
-                      Move to Review
+                      <Send size={14} />
+                      Submit for Review
                     </button>
                   )}
-                  {task.status !== 'done' && (
-                    <button 
-                      onClick={() => handleStatusChange('done')}
-                      className="w-full flex items-center gap-2 px-4 py-2 bg-emerald-50 text-emerald-700 rounded-xl text-xs font-bold hover:bg-emerald-100 transition-colors"
-                    >
-                      <Tag size={14} />
-                      Mark as Done
-                    </button>
+
+                  {/* PM/Admin Approval Console */}
+                  {(userData.role === 'admin' || userData.role === 'project_manager') && task.status === 'review' && (
+                    <div className="space-y-2 p-4 bg-gray-50 rounded-[2rem] border border-gray-100 mt-4">
+                      <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest text-center mb-2">Review Management</p>
+                      <button 
+                        onClick={() => handleStatusChange('done')}
+                        className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-500 text-white rounded-xl text-xs font-black hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-100"
+                      >
+                        <CheckCircle2 size={14} />
+                        Approve & Complete
+                      </button>
+                      <button 
+                        onClick={() => handleStatusChange('in_progress')}
+                        className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-white text-red-600 border border-red-100 rounded-xl text-xs font-bold hover:bg-red-50 transition-all"
+                      >
+                        <X size={14} />
+                        Reject (Needs Work)
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Developer Perspective */}
+                  {userData.role !== 'admin' && userData.role !== 'project_manager' && task.status === 'review' && (
+                    <div className="p-6 bg-amber-50/50 border border-amber-100/50 rounded-3xl text-center space-y-2">
+                       <Clock size={24} className="mx-auto text-amber-500 animate-pulse" />
+                       <p className="text-xs font-black text-amber-700 uppercase tracking-tight">Under Review</p>
+                       <p className="text-[10px] text-amber-600/70 font-medium">Waiting for Project Manager to verify and approve your work.</p>
+                    </div>
+                  )}
+                  
+                  {task.status === 'done' && (
+                     <div className="p-6 bg-emerald-50 border border-emerald-100 rounded-3xl text-center space-y-2">
+                        <CheckCircle2 size={24} className="mx-auto text-emerald-500" />
+                        <p className="text-xs font-black text-emerald-700 uppercase tracking-tight">Approved & Completed</p>
+                     </div>
                   )}
                 </div>
               </div>
