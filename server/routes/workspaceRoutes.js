@@ -6,13 +6,13 @@ const {
   getWorkspaceById,
   inviteToWorkspace
 } = require('../controllers/workspaceController');
-const { protect } = require('../middlewares/authMiddleware');
+const { protect, authorize } = require('../middlewares/authMiddleware');
 
 router.use(protect);
 
-router.post('/', createWorkspace);
+router.post('/', authorize('admin', 'project_manager'), createWorkspace);
 router.get('/', getWorkspaces);
 router.get('/:id', getWorkspaceById);
-router.post('/:id/invite', inviteToWorkspace);
+router.post('/:id/invite', authorize('admin', 'project_manager'), inviteToWorkspace);
 
 module.exports = router;

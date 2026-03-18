@@ -165,9 +165,11 @@ const ProjectPage = () => {
                 Add Task
               </button>
             )}
-            <button className="p-3 bg-white border border-gray-100 rounded-2xl text-gray-400 hover:text-gray-900 hover:border-gray-200 transition-all shadow-sm">
-              <Settings size={20} />
-            </button>
+            {!isDeveloper && (
+              <button className="p-3 bg-white border border-gray-100 rounded-2xl text-gray-400 hover:text-gray-900 hover:border-gray-200 transition-all shadow-sm">
+                <Settings size={20} />
+              </button>
+            )}
           </div>
         </div>
 

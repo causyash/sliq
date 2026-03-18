@@ -11,10 +11,10 @@ const { protect } = require('../middlewares/authMiddleware');
 
 router.use(protect);
 
-router.post('/', createTask);
+router.post('/', authorize('admin', 'project_manager'), createTask);
 router.get('/project/:projectId', getProjectTasks);
 router.get('/:id', getTaskById);
 router.put('/:id', updateTask);
-router.delete('/:id', deleteTask);
+router.delete('/:id', authorize('admin', 'project_manager'), deleteTask);
 
 module.exports = router;

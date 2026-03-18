@@ -93,12 +93,14 @@ const TaskModal = ({ task, onClose, onUpdate, onDelete }) => {
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <button 
-              onClick={handleDelete}
-              className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all"
-            >
-              <Trash2 size={20} />
-            </button>
+            {userData.role !== 'developer' && (
+              <button 
+                onClick={handleDelete}
+                className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all"
+              >
+                <Trash2 size={20} />
+              </button>
+            )}
             <button 
               onClick={onClose}
               className="p-2 text-gray-400 hover:text-gray-900 hover:bg-white rounded-xl transition-all"
