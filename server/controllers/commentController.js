@@ -22,8 +22,22 @@ const addComment = async (req, res) => {
     });
 
     const populatedComment = await Comment.findById(comment._id).populate('userId', 'name avatar');
-
     const socket = require('../socket');
+
+    // Extract @mentions
+    const mentionRegex = /@(\w+)/g;
+    const mentions = message.match(mentionRegex) || [];
+    const mentionedNames = mentions.map(m => m.substring(1));
+    
+    const User = require('../models/User');
+    const Workspace = require('../models/Workspace');
+    const project = await Project.findById(task.projectId);
+    const workspace = await Workspace.findById(project.workspaceId).populate('members', 'name _id');
+
+    const mentionedUsers = workspace.members.filter(m => 
+      mentionedNames.includes(m.name.replace(/\s+/g, '')) || 
+      mentionedNames.includes(m.name.split(' ')[0])
+    );
     // Emit to project room
     socket.getIO().to(task.projectId.toString()).emit('comment_added', {
       taskId: task._id,
@@ -32,21 +46,31 @@ const addComment = async (req, res) => {
 
     // Notify task creator and assignee
     const notifyUsers = new Set();
-    if (task.createdBy.toString() !== req.user._id.toString()) notifyUsers.add(task.createdBy);
-    if (task.assignee && task.assignee.toString() !== req.user._id.toString()) notifyUsers.add(task.assignee);
+    if (task.createdBy.toString() !== req.user._id.toString()) notifyUsers.add(task.createdBy.toString());
+    if (task.assignee && task.assignee.toString() !== req.user._id.toString()) notifyUsers.add(task.assignee.toString());
+
+    // Notify mentioned users
+    for (const mUser of mentionedUsers) {
+      if (mUser._id.toString() !== req.user._id.toString()) {
+        notifyUsers.add(mUser._id.toString());
+      }
+    }
 
     for (const userId of notifyUsers) {
+      const isMention = mentionedUsers.some(mu => mu._id.toString() === userId && !([task.createdBy.toString(), task.assignee?.toString()].includes(userId)));
+      
       const notification = await Notification.create({
         userId,
         type: 'comment_added',
-        message: `${req.user.name} commented on task: ${task.title}`,
+        message: isMention 
+          ? `${req.user.name} mentioned you in a comment on: ${task.title}`
+          : `${req.user.name} commented on task: ${task.title}`,
         relatedTask: task._id
       });
-      socket.getIO().to(userId.toString()).emit('notification_received', notification);
+      socket.getIO().to(userId).emit('notification_received', notification);
     }
 
     // Log Activity
-    const project = await Project.findById(task.projectId);
     const logActivity = require('../utils/activityLogger');
     await logActivity({
       workspaceId: project.workspaceId,

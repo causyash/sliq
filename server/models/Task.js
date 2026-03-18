@@ -32,6 +32,10 @@ const TaskSchema = new mongoose.Schema({
   dueDate: {
     type: Date
   },
+  subtasks: [{
+    title: { type: String, required: true },
+    isCompleted: { type: Boolean, default: false }
+  }],
   labels: [{
     type: String
   }],
