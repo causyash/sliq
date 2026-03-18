@@ -6,6 +6,7 @@ import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import AnalyticsPage from './pages/AnalyticsPage';
 import AdminAnalyticsPage from './pages/AdminAnalyticsPage';
+import CalendarPage from './pages/CalendarPage';
 import './App.css';
 
 // Protected Route component
@@ -65,6 +66,12 @@ function App() {
         <Route path="/admin/analytics" element={
           <ProtectedRoute adminOnly={true}>
             <AdminAnalyticsPage />
+          </ProtectedRoute>
+        } />
+
+        <Route path="/calendar" element={
+          <ProtectedRoute>
+            <CalendarPage />
           </ProtectedRoute>
         } />
 

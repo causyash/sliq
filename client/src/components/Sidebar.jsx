@@ -6,6 +6,7 @@ import {
   Kanban, 
   BarChart3, 
   Settings,
+  Calendar,
   LogOut
 } from 'lucide-react';
 
@@ -17,12 +18,14 @@ const Sidebar = () => {
     ? [
         { name: 'Admin Console', path: '/', icon: <LayoutDashboard size={20} /> },
         { name: 'Analytics', path: '/admin/analytics', icon: <BarChart3 size={20} /> },
+        { name: 'Calendar', path: '/calendar', icon: <Calendar size={20} /> },
       ]
     : [
         { name: 'Dashboard', path: '/', icon: <LayoutDashboard size={20} /> },
         { name: 'Workspaces', path: '/workspaces', icon: <Briefcase size={20} /> },
         { name: 'Projects', path: '/projects', icon: <Kanban size={20} /> },
         { name: 'Analytics', path: '/analytics', icon: <BarChart3 size={20} /> },
+        { name: 'Calendar', path: '/calendar', icon: <Calendar size={20} /> },
       ];
 
   const handleLogout = () => {

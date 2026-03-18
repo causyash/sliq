@@ -237,11 +237,45 @@ const deleteTask = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+// @desc    Get all tasks user has access to (for calendar)
+// @route   GET /api/tasks/all
+// @access  Private
+const getAllTasks = async (req, res) => {
+  try {
+    let tasks;
+    if (req.user.role === 'admin') {
+      tasks = await Task.find({})
+        .populate('assignee', 'name avatar')
+        .populate('projectId', 'name');
+    } else {
+      // Get workspaces where user is a member
+      const userWorkspaces = await Workspace.find({ members: req.user._id });
+      const workspaceIds = userWorkspaces.map(w => w._id);
+      
+      // Get projects in those workspaces OR where user is a direct member
+      const userProjects = await Project.find({
+        $or: [
+          { workspaceId: { $in: workspaceIds } },
+          { members: req.user._id }
+        ]
+      });
+      const projectIds = userProjects.map(p => p._id);
+
+      tasks = await Task.find({ projectId: { $in: projectIds } })
+        .populate('assignee', 'name avatar')
+        .populate('projectId', 'name');
+    }
+    res.json(tasks);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 
 module.exports = {
   createTask,
   getProjectTasks,
   getTaskById,
   updateTask,
-  deleteTask
+  deleteTask,
+  getAllTasks
 };
