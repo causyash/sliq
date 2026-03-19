@@ -8,7 +8,7 @@ const NotificationSchema = new mongoose.Schema({
   },
   type: {
     type: String,
-    enum: ['task_assigned', 'status_changed', 'comment_added'],
+    enum: ['task_assigned', 'status_changed', 'comment_added', 'meeting_scheduled'],
     required: true
   },
   message: {
@@ -18,6 +18,10 @@ const NotificationSchema = new mongoose.Schema({
   relatedTask: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Task'
+  },
+  relatedMeeting: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Meeting'
   },
   isRead: {
     type: Boolean,

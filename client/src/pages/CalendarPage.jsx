@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { 
   ChevronLeft, 
   ChevronRight, 
@@ -10,7 +11,7 @@ import {
   Filter,
   Video
 } from 'lucide-react';
-import { taskAPI } from '../services/api';
+import { taskAPI, meetingAPI } from '../services/api';
 import Layout from '../components/Layout';
 import TaskModal from '../components/TaskModal';
 import CreateMeetingModal from '../components/CreateMeetingModal';
@@ -18,18 +19,24 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 const CalendarPage = () => {
   const [tasks, setTasks] = useState([]);
+  const [meetings, setMeetings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedTask, setSelectedTask] = useState(null);
   const [view, setView] = useState('month'); // 'month' or 'week'
   const [isMeetingModalOpen, setIsMeetingModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
+  const navigate = useNavigate();
 
   const fetchData = async () => {
     try {
       setLoading(true);
-      const { data } = await taskAPI.getAll();
-      setTasks(data);
+      const [{ data: tasksData }, { data: meetingsData }] = await Promise.all([
+        taskAPI.getAll(),
+        meetingAPI.getAll()
+      ]);
+      setTasks(tasksData);
+      setMeetings(meetingsData);
     } catch (err) {
       console.error('Failed to fetch tasks for calendar', err);
     } finally {
@@ -71,9 +78,18 @@ const CalendarPage = () => {
 
     // Days of current month
     for (let d = 1; d <= numDays; d++) {
+      const dayDate = new Date(year, month, d);
       const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+      
       const dayTasks = tasks.filter(t => t.dueDate && t.dueDate.split('T')[0] === dateStr);
-      const isToday = new Date().toDateString() === new Date(year, month, d).toDateString();
+      const dayMeetings = meetings.filter(m => {
+        const mDate = new Date(m.date);
+        return mDate.getUTCFullYear() === year && 
+               mDate.getUTCMonth() === month && 
+               mDate.getUTCDate() === d;
+      });
+
+      const isToday = new Date().toDateString() === dayDate.toDateString();
 
       days.push(
         <div key={d} className={`h-32 p-3 border border-gray-100 rounded-3xl transition-all hover:shadow-xl hover:shadow-indigo-50/50 group bg-white ${isToday ? 'ring-2 ring-indigo-500 ring-inset' : ''}`}>
@@ -83,6 +99,17 @@ const CalendarPage = () => {
             </span>
           </div>
           <div className="space-y-1 overflow-y-auto max-h-20 custom-scrollbar pr-1">
+            {dayMeetings.map(meeting => (
+              <button 
+                key={meeting._id}
+                onClick={() => navigate(`/meeting/${meeting.roomId}`)}
+                className="w-full text-left px-2 py-1 rounded-lg text-[10px] font-black truncate transition-all active:scale-95 bg-indigo-600 text-white border border-indigo-700 flex items-center gap-1 shadow-sm"
+                title={`Meeting: ${meeting.title} at ${meeting.time}`}
+              >
+                <Video size={10} />
+                {meeting.time} {meeting.title}
+              </button>
+            ))}
             {dayTasks.map(task => (
               <button 
                 key={task._id}

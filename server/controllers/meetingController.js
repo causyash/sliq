@@ -1,4 +1,9 @@
 const Meeting = require('../models/Meeting');
+const User = require('../models/User');
+const Notification = require('../models/Notification');
+const Workspace = require('../models/Workspace');
+const Project = require('../models/Project');
+const socketIO = require('../socket');
 const crypto = require('crypto');
 
 exports.createMeeting = async (req, res) => {
@@ -22,10 +27,41 @@ exports.createMeeting = async (req, res) => {
 
     const savedMeeting = await newMeeting.save();
     
-    // Populate the organizer before sending response
+    // Populate the organizer before sending response/notifications
     await savedMeeting.populate('organizer', 'name email');
     if (savedMeeting.project) await savedMeeting.populate('project', 'name');
     if (savedMeeting.workspace) await savedMeeting.populate('workspace', 'name');
+
+    // Notification Logic: Notify everyone in the workspace/project OR all developers
+    let recipientIds = [];
+    if (workspace) {
+      const ws = await Workspace.findById(workspace);
+      if (ws) {
+        recipientIds = ws.members.map(m => m.toString());
+      }
+    } else {
+      // Fallback: Notify all developers if no specific workspace provided
+      const developers = await User.find({ role: 'developer' });
+      recipientIds = developers.map(d => d._id.toString());
+    }
+
+    // Filter out the organizer
+    recipientIds = recipientIds.filter(id => id !== req.user._id.toString());
+
+    // Create notifications and emit real-time events
+    const io = socketIO.getIO();
+    for (const recipientId of [...new Set(recipientIds)]) {
+      const notification = new Notification({
+        userId: recipientId,
+        type: 'meeting_scheduled',
+        message: `${req.user.name} scheduled a meeting: ${title} on ${new Date(date).toLocaleDateString()} at ${time}`,
+        relatedMeeting: savedMeeting._id
+      });
+      await notification.save();
+      
+      // Real-time notification if they are in the user room
+      io.to(recipientId).emit('new_notification', notification);
+    }
 
     res.status(201).json(savedMeeting);
   } catch (error) {
