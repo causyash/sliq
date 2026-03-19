@@ -7,6 +7,7 @@ import SignupPage from './pages/SignupPage';
 import AnalyticsPage from './pages/AnalyticsPage';
 import AdminAnalyticsPage from './pages/AdminAnalyticsPage';
 import CalendarPage from './pages/CalendarPage';
+import MeetingsPage from './pages/MeetingsPage';
 import MeetingPage from './pages/MeetingPage';
 import './App.css';
 
@@ -73,6 +74,12 @@ function App() {
         <Route path="/calendar" element={
           <ProtectedRoute>
             <CalendarPage />
+          </ProtectedRoute>
+        } />
+
+        <Route path="/meetings" element={
+          <ProtectedRoute>
+            <MeetingsPage />
           </ProtectedRoute>
         } />
 

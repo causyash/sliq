@@ -1,0 +1,9 @@
+const express = require('express');
+const router = express.Router();
+const { createMeeting, getMeetings } = require('../controllers/meetingController');
+const { protect } = require('../middleware/authMiddleware');
+
+router.post('/', protect, createMeeting);
+router.get('/', protect, getMeetings);
+
+module.exports = router;

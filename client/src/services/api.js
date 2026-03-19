@@ -67,4 +67,9 @@ export const activityAPI = {
   getByProject: (projectId) => API.get(`/activity/project/${projectId}`),
 };
 
+export const meetingAPI = {
+  create: (data) => API.post('/meetings', data),
+  getAll: () => API.get('/meetings'),
+};
+
 export default API;

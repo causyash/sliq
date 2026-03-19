@@ -7,7 +7,8 @@ import {
   BarChart3, 
   Settings,
   Calendar,
-  LogOut
+  LogOut,
+  Video
 } from 'lucide-react';
 
 const Sidebar = () => {
@@ -19,6 +20,7 @@ const Sidebar = () => {
         { name: 'Admin Console', path: '/', icon: <LayoutDashboard size={20} /> },
         { name: 'Analytics', path: '/admin/analytics', icon: <BarChart3 size={20} /> },
         { name: 'Calendar', path: '/calendar', icon: <Calendar size={20} /> },
+        { name: 'Meetings', path: '/meetings', icon: <Video size={20} /> },
       ]
     : [
         { name: 'Dashboard', path: '/', icon: <LayoutDashboard size={20} /> },
@@ -26,6 +28,7 @@ const Sidebar = () => {
         { name: 'Projects', path: '/projects', icon: <Kanban size={20} /> },
         { name: 'Analytics', path: '/analytics', icon: <BarChart3 size={20} /> },
         { name: 'Calendar', path: '/calendar', icon: <Calendar size={20} /> },
+        { name: 'Meetings', path: '/meetings', icon: <Video size={20} /> },
       ];
 
   const handleLogout = () => {

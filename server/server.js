@@ -42,6 +42,7 @@ app.use('/api/comments', require('./routes/commentRoutes'));
 app.use('/api/analytics', require('./routes/analyticsRoutes'));
 app.use('/api/notifications', require('./routes/notificationRoutes'));
 app.use('/api/activity', require('./routes/activityRoutes'));
+app.use('/api/meetings', require('./routes/meetingRoutes'));
 
 app.get('/', (req, res) => {
   res.send('Project Management API is running...');

@@ -7,11 +7,13 @@ import {
   Tag, 
   User,
   Layout as LayoutIcon,
-  Filter
+  Filter,
+  Video
 } from 'lucide-react';
 import { taskAPI } from '../services/api';
 import Layout from '../components/Layout';
 import TaskModal from '../components/TaskModal';
+import CreateMeetingModal from '../components/CreateMeetingModal';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const CalendarPage = () => {
@@ -20,6 +22,8 @@ const CalendarPage = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedTask, setSelectedTask] = useState(null);
   const [view, setView] = useState('month'); // 'month' or 'week'
+  const [isMeetingModalOpen, setIsMeetingModalOpen] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(null);
 
   const fetchData = async () => {
     try {
@@ -113,13 +117,21 @@ const CalendarPage = () => {
           <p className="text-gray-500 font-medium">Manage your deadlines and milestones.</p>
         </div>
 
-        <div className="flex items-center gap-4 bg-white p-2 rounded-2xl border border-gray-100 shadow-sm">
-           <button 
-             onClick={prevMonth}
-             className="p-2 hover:bg-gray-50 rounded-xl text-gray-400 hover:text-gray-900 transition-all"
-           >
-             <ChevronLeft size={20} />
-           </button>
+        <div className="flex items-center gap-4">
+          <button 
+             onClick={() => { setSelectedDate(new Date()); setIsMeetingModalOpen(true); }}
+             className="flex items-center gap-2 bg-indigo-600 text-white px-5 py-2.5 rounded-xl font-semibold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100"
+          >
+             <Video size={18} /> 
+             Schedule 
+          </button>
+          <div className="flex items-center gap-4 bg-white p-2 rounded-2xl border border-gray-100 shadow-sm">
+             <button 
+               onClick={prevMonth}
+               className="p-2 hover:bg-gray-50 rounded-xl text-gray-400 hover:text-gray-900 transition-all"
+             >
+               <ChevronLeft size={20} />
+             </button>
            <h2 className="text-sm font-black text-gray-900 min-w-[120px] text-center">
              {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
            </h2>
@@ -129,6 +141,7 @@ const CalendarPage = () => {
            >
              <ChevronRight size={20} />
            </button>
+          </div>
         </div>
       </div>
 
@@ -160,6 +173,17 @@ const CalendarPage = () => {
           onDelete={() => {
             setSelectedTask(null);
             fetchData();
+          }}
+        />
+      )}
+
+      {isMeetingModalOpen && (
+        <CreateMeetingModal
+          initialDate={selectedDate}
+          onClose={() => setIsMeetingModalOpen(false)}
+          onSuccess={() => {
+            setIsMeetingModalOpen(false);
+            // Optionally could navigate to /meetings here or show toast
           }}
         />
       )}
