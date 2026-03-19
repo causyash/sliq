@@ -180,21 +180,23 @@ const CalendarPage = () => {
         </div>
       </div>
 
-      <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm shadow-indigo-100/20">
-        <div className="grid grid-cols-7 gap-4 mb-6">
-          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-            <div key={day} className="text-center text-[10px] font-black text-gray-400 uppercase tracking-widest">
-              {day}
-            </div>
-          ))}
-        </div>
+      <div className="bg-white p-4 lg:p-8 rounded-[2.5rem] border border-gray-100 shadow-sm shadow-indigo-100/20 overflow-x-auto custom-scrollbar">
+        <div className="min-w-[800px]">
+          <div className="grid grid-cols-7 gap-4 mb-6">
+            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+              <div key={day} className="text-center text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                {day}
+              </div>
+            ))}
+          </div>
 
-        <div className="grid grid-cols-7 gap-4">
-          {loading ? (
-            Array(35).fill(0).map((_, i) => (
-              <div key={i} className="h-32 bg-gray-50 animate-pulse rounded-3xl"></div>
-            ))
-          ) : renderMonthDays()}
+          <div className="grid grid-cols-7 gap-4">
+            {loading ? (
+              Array(35).fill(0).map((_, i) => (
+                <div key={i} className="h-32 bg-gray-50 animate-pulse rounded-3xl"></div>
+              ))
+            ) : renderMonthDays()}
+          </div>
         </div>
       </div>
 

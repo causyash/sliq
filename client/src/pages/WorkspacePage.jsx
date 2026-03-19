@@ -74,20 +74,20 @@ const WorkspacePage = () => {
 
   return (
     <Layout>
-      <div className="mb-10 lg:flex items-start justify-between gap-8">
+      <div className="mb-10 flex flex-col xl:flex-row xl:items-start xl:justify-between gap-8">
         <div className="flex-1">
           <div className="flex items-center gap-4 mb-3">
-            <div className="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center text-white font-bold text-xl">
+            <div className="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center text-white font-bold text-xl shrink-0">
               {workspace.name.charAt(0).toUpperCase()}
             </div>
             <div>
-              <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">{workspace.name}</h1>
-              <div className="flex items-center gap-3 mt-1">
+              <h1 className="text-2xl lg:text-3xl font-extrabold text-gray-900 tracking-tight">{workspace.name}</h1>
+              <div className="flex flex-wrap items-center gap-3 mt-1">
                 <span className="flex items-center gap-1 text-sm text-gray-500">
                   <Users size={14} />
                   {workspace.members.length} Members
                 </span>
-                <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
+                <span className="hidden sm:inline w-1 h-1 bg-gray-300 rounded-full"></span>
                 <span className="text-sm text-gray-500">Founded by {workspace.owner?.name}</span>
               </div>
             </div>
@@ -95,45 +95,47 @@ const WorkspacePage = () => {
         </div>
 
         {!isDeveloper && (
-          <div className="mt-6 lg:mt-0 flex gap-3">
-            <form onSubmit={handleInvite} className="flex gap-2">
+          <div className="flex flex-wrap items-center gap-3">
+            <form onSubmit={handleInvite} className="flex gap-2 w-full sm:w-auto">
               <input 
                 type="email"
                 value={inviteEmail}
                 onChange={(e) => setInviteEmail(e.target.value)}
-                placeholder="Team member email..."
-                className="px-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-500 text-sm"
+                placeholder="User email"
+                className="flex-1 min-w-0 sm:w-48 px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500/20 outline-none"
               />
               <button 
                 type="submit"
                 disabled={inviteLoading}
-                className="flex items-center gap-2 bg-white border border-gray-200 text-gray-700 px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-gray-50 transition-all shadow-sm"
+                className="flex items-center gap-2 bg-gray-900 text-white px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-black transition-all disabled:opacity-50"
               >
                 <Mail size={16} />
-                {inviteLoading ? 'Inviting...' : 'Invite'}
+                {inviteLoading ? '...' : 'Invite'}
               </button>
             </form>
-            <button 
-              onClick={() => navigate(`/meeting/workspace-${id}`)}
-              className="flex items-center gap-2 bg-white border border-gray-200 text-gray-700 px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-gray-50 transition-all shadow-sm"
-            >
-              <Video size={18} className="text-indigo-600" />
-              Meeting
-            </button>
-            <button 
-              onClick={() => setIsMeetingModalOpen(true)}
-              className="flex items-center gap-2 bg-white border border-gray-200 text-gray-700 px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-gray-50 transition-all shadow-sm"
-            >
-              <Calendar size={18} className="text-indigo-600" />
-              Schedule 
-            </button>
-            <button 
-              onClick={() => setIsModalOpen(true)}
-              className="flex items-center gap-2 bg-indigo-600 text-white px-5 py-2.5 rounded-xl font-semibold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100"
-            >
-              <Plus size={20} />
-              New Project
-            </button>
+            <div className="flex gap-2 w-full sm:w-auto">
+              <button 
+                onClick={() => navigate(`/meeting/workspace-${id}`)}
+                className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-white border border-gray-200 text-gray-700 px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-gray-50 transition-all shadow-sm"
+              >
+                <Video size={18} className="text-indigo-600" />
+                Meeting
+              </button>
+              <button 
+                onClick={() => setIsMeetingModalOpen(true)}
+                className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-white border border-gray-200 text-gray-700 px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-gray-50 transition-all shadow-sm"
+              >
+                <Calendar size={18} className="text-indigo-600" />
+                Schedule 
+              </button>
+              <button 
+                onClick={() => setIsModalOpen(true)}
+                className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-indigo-600 text-white px-5 py-2.5 rounded-xl font-semibold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100"
+              >
+                <Plus size={20} />
+                New Project
+              </button>
+            </div>
           </div>
         )}
       </div>

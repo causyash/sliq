@@ -8,10 +8,11 @@ import {
   Settings,
   Calendar,
   LogOut,
-  Video
+  Video,
+  X
 } from 'lucide-react';
 
-const Sidebar = () => {
+const Sidebar = ({ onNavClick }) => {
   const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
   const isAdmin = userInfo.role === 'admin';
 
@@ -37,12 +38,17 @@ const Sidebar = () => {
   };
 
   return (
-    <aside className="w-64 bg-white border-r border-gray-200 h-screen flex flex-col sticky top-0">
-      <div className="p-6 border-b border-gray-100 flex items-center gap-3">
-        <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
-          <Kanban className="text-white" size={18} />
+    <aside className="w-64 bg-white border-r border-gray-200 h-screen flex flex-col shadow-2xl lg:shadow-none">
+      <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
+            <Kanban className="text-white" size={18} />
+          </div>
+          <span className="text-xl font-bold text-gray-900 tracking-tight">Sliq</span>
         </div>
-        <span className="text-xl font-bold text-gray-900 tracking-tight">Sliq</span>
+        <button onClick={onNavClick} className="lg:hidden p-2 text-gray-400 hover:text-gray-900 transition-colors">
+          <X size={20} />
+        </button>
       </div>
 
       <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
@@ -50,6 +56,7 @@ const Sidebar = () => {
           <NavLink
             key={item.name}
             to={item.path}
+            onClick={onNavClick}
             className={({ isActive }) => `
               flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200
               ${isActive 

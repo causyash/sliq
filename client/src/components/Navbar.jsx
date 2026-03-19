@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Search, ChevronDown, User } from 'lucide-react';
+import { Search, ChevronDown, User, Menu } from 'lucide-react';
 import NotificationBell from './NotificationBell';
 
-const Navbar = () => {
+const Navbar = ({ onMenuClick }) => {
   const [userName, setUserName] = useState('User');
 
   useEffect(() => {
@@ -14,8 +14,15 @@ const Navbar = () => {
   }, []);
 
   return (
-    <header className="h-20 border-b border-gray-100 bg-white/80 backdrop-blur-md sticky top-0 z-40 px-8 flex items-center justify-between">
-      <div className="flex-1 max-w-xl">
+    <header className="h-20 border-b border-gray-100 bg-white/80 backdrop-blur-md sticky top-0 z-40 px-4 lg:px-8 flex items-center justify-between gap-4">
+      <button 
+        onClick={onMenuClick}
+        className="lg:hidden p-2 text-gray-500 hover:bg-gray-100 rounded-xl transition-colors"
+      >
+        <Menu size={24} />
+      </button>
+
+      <div className="flex-1 max-w-xl hidden sm:block">
         <div className="relative group">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-indigo-500 transition-colors" size={18} />
           <input 

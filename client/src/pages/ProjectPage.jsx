@@ -147,18 +147,18 @@ const ProjectPage = () => {
           </Link>
         )}
         
-        <div className="flex items-start justify-between">
+        <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
           <div>
             <div className="flex items-center gap-3 mb-2">
               <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600 shadow-sm">
                 <Kanban size={24} />
               </div>
-              <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight">{project.name}</h1>
+              <h1 className="text-3xl lg:text-4xl font-extrabold text-gray-900 tracking-tight">{project.name}</h1>
             </div>
-            <p className="text-gray-500 max-w-2xl px-1">{project.description || 'No description provided for this project.'}</p>
+            <p className="text-gray-500 max-w-2xl px-1 text-sm lg:text-base">{project.description || 'No description provided for this project.'}</p>
           </div>
           
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <button 
               onClick={() => navigate(`/meeting/project-${id}`)}
               className="flex items-center gap-2 bg-white border border-gray-200 text-gray-700 px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-gray-50 transition-all shadow-sm"
@@ -190,7 +190,7 @@ const ProjectPage = () => {
           </div>
         </div>
 
-        <div className="flex gap-6 mt-10 border-b border-gray-100">
+        <div className="flex gap-6 mt-10 border-b border-gray-100 overflow-x-auto no-scrollbar">
           <button 
             onClick={() => setView('overview')}
             className={`pb-4 px-2 text-sm font-bold transition-all border-b-2 flex items-center gap-2 ${view === 'overview' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-400 hover:text-gray-600'}`}
