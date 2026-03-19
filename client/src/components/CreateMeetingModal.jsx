@@ -3,10 +3,18 @@ import { X, Calendar as CalendarIcon, Clock, Type, AlignLeft } from 'lucide-reac
 import { meetingAPI } from '../services/api';
 
 const CreateMeetingModal = ({ onClose, onSuccess, initialDate }) => {
+  const formatDate = (date) => {
+    const d = new Date(date);
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    const year = d.getFullYear();
+    return `${year}-${month}-${day}`;
+  };
+
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    date: initialDate ? initialDate.toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+    date: initialDate ? formatDate(initialDate) : formatDate(new Date()),
     time: '12:00'
   });
   const [loading, setLoading] = useState(false);
