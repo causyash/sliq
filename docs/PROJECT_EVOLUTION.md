@@ -77,6 +77,35 @@ Quickly find anything across the entire workspace.
 - **Implementation**: A keyboard-accessible search bar (Cmd+K) that searches tasks, projects, and users simultaneously.
 - **Value**: Improves user efficiency as the volume of work grows.
 
+## 🏢 6. Microsoft Teams & Collaborative Hub Features
+
+Integrating the core strengths of **Microsoft Teams** into **Sliq** would create an all-in-one "Collaboration Operating System." While Sliq already supports "Workspaces" (similar to Teams/Communities), the following features would bridge the gap between project management and real-time collaboration.
+
+### 🎥 Real-Time Video & Audio Meetings
+Bring high-bandwidth communication directly into the project context.
+- **Implementation**: Integrate WebRTC-based video conferencing (via Jitsi, 100ms, or Twilio). Allow users to "Launch Meeting" from a specific task or project channel.
+- **Value**: Reduces context switching by enabling team discussions without leaving the app.
+
+### 🗓️ Integrated Scheduling & Calendar Sync
+Moving beyond a simple task view to a full-featured scheduling system.
+- **Implementation**: Bi-directional sync with Google Calendar and Outlook. "Meeting Invites" directly within Sliq that automatically create tasks or update user availability.
+- **Value**: Ensures team members' schedules and project deadlines are perfectly aligned.
+
+### 💬 Threaded Messaging & Channels
+While Workspaces exist, structured real-time chat within them is key.
+- **Implementation**: Robust WebSocket-based chat with support for threads, reactions, and pinned messages. Organize conversations into "Channels" within each Workspace.
+- **Value**: Replaces fragmented emails and external Slack/Teams instances with centralized, searchable project communication.
+
+### 📄 Collaborative Whiteboarding
+Brainstorming sessions require a digital canvas.
+- **Implementation**: Embed a library like `excalidraw` or `tldraw` into the project view.
+- **Value**: Visual collaboration (mind maps, architecture diagrams) that lives alongside the task board.
+
+### 🟢 Rich Presence & "Status" (Busy/Away/In Meeting)
+Knowing when a teammate is available for collaboration.
+- **Implementation**: Automatic status updates based on meeting attendance or activity. Manual "Status Message" settings.
+- **Value**: Respects user focus and manages team expectations for response times.
+
 ---
 
 ## ⚡ Next Logical Steps for Sliq

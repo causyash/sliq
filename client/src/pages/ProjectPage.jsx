@@ -11,7 +11,8 @@ import {
   AlertCircle,
   BarChart3,
   Layout as LayoutIcon,
-  Plus
+  Plus,
+  Video
 } from 'lucide-react';
 import { projectAPI, taskAPI, activityAPI } from '../services/api';
 import socket, { joinProject } from '../services/socket';
@@ -156,6 +157,13 @@ const ProjectPage = () => {
           </div>
           
           <div className="flex gap-2">
+            <button 
+              onClick={() => navigate(`/meeting/project-${id}`)}
+              className="flex items-center gap-2 bg-white border border-gray-200 text-gray-700 px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-gray-50 transition-all shadow-sm"
+            >
+              <Video size={18} className="text-indigo-600" />
+              Meet
+            </button>
             {!isDeveloper && (
               <button 
                 onClick={() => openCreateModal()}

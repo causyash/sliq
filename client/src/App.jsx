@@ -7,6 +7,7 @@ import SignupPage from './pages/SignupPage';
 import AnalyticsPage from './pages/AnalyticsPage';
 import AdminAnalyticsPage from './pages/AdminAnalyticsPage';
 import CalendarPage from './pages/CalendarPage';
+import MeetingPage from './pages/MeetingPage';
 import './App.css';
 
 // Protected Route component
@@ -72,6 +73,12 @@ function App() {
         <Route path="/calendar" element={
           <ProtectedRoute>
             <CalendarPage />
+          </ProtectedRoute>
+        } />
+
+        <Route path="/meeting/:roomId" element={
+          <ProtectedRoute>
+            <MeetingPage />
           </ProtectedRoute>
         } />
 
