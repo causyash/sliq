@@ -20,6 +20,7 @@ import Layout from '../components/Layout';
 import KanbanBoard from '../components/KanbanBoard';
 import TaskModal from '../components/TaskModal';
 import CreateTaskModal from '../components/CreateTaskModal';
+import CreateMeetingModal from '../components/CreateMeetingModal';
 import ActivityTimeline from '../components/ActivityTimeline';
 
 const ProjectPage = () => {
@@ -32,6 +33,7 @@ const ProjectPage = () => {
   const [view, setView] = useState('kanban'); // 'overview' or 'kanban'
   const [selectedTask, setSelectedTask] = useState(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isMeetingModalOpen, setIsMeetingModalOpen] = useState(false);
   const [initialStatus, setInitialStatus] = useState('todo');
   const navigate = useNavigate();
   const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
@@ -163,6 +165,13 @@ const ProjectPage = () => {
             >
               <Video size={18} className="text-indigo-600" />
               Meet
+            </button>
+            <button 
+              onClick={() => setIsMeetingModalOpen(true)}
+              className="flex items-center gap-2 bg-white border border-gray-200 text-gray-700 px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-gray-50 transition-all shadow-sm"
+            >
+              <Calendar size={18} className="text-indigo-600" />
+              Schedule 
             </button>
             {!isDeveloper && (
               <button 
@@ -324,6 +333,17 @@ const ProjectPage = () => {
           onSuccess={() => {
             setIsCreateModalOpen(false);
             fetchData();
+          }}
+        />
+      )}
+
+      {isMeetingModalOpen && (
+        <CreateMeetingModal
+          onClose={() => setIsMeetingModalOpen(false)}
+          defaultProjectId={project._id}
+          onSuccess={() => {
+            setIsMeetingModalOpen(false);
+            // Optionally navigate to meetings or show toast
           }}
         />
       )}

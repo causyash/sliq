@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Plus, FolderKanban, Users, Settings, Mail, Video } from 'lucide-react';
+import { Plus, FolderKanban, Users, Settings, Mail, Video, Calendar } from 'lucide-react';
 import { workspaceAPI, projectAPI } from '../services/api';
 import Layout from '../components/Layout';
 import ProjectCard from '../components/ProjectCard';
 import CreateProjectModal from '../components/CreateProjectModal';
+import CreateMeetingModal from '../components/CreateMeetingModal';
 
 const WorkspacePage = () => {
   const { id } = useParams();
@@ -13,6 +14,7 @@ const WorkspacePage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isMeetingModalOpen, setIsMeetingModalOpen] = useState(false);
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteLoading, setInviteLoading] = useState(false);
   const navigate = useNavigate();
@@ -119,6 +121,13 @@ const WorkspacePage = () => {
               Meeting
             </button>
             <button 
+              onClick={() => setIsMeetingModalOpen(true)}
+              className="flex items-center gap-2 bg-white border border-gray-200 text-gray-700 px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-gray-50 transition-all shadow-sm"
+            >
+              <Calendar size={18} className="text-indigo-600" />
+              Schedule 
+            </button>
+            <button 
               onClick={() => setIsModalOpen(true)}
               className="flex items-center gap-2 bg-indigo-600 text-white px-5 py-2.5 rounded-xl font-semibold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100"
             >
@@ -179,6 +188,16 @@ const WorkspacePage = () => {
             setIsModalOpen(false);
             fetchWorkspaceData();
           }} 
+        />
+      )}
+
+      {isMeetingModalOpen && (
+        <CreateMeetingModal
+          onClose={() => setIsMeetingModalOpen(false)}
+          defaultWorkspaceId={id}
+          onSuccess={() => {
+            setIsMeetingModalOpen(false);
+          }}
         />
       )}
     </Layout>

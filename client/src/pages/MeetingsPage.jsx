@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Video, Calendar, Clock, Users } from 'lucide-react';
+import { Video, Calendar, Clock, Users, Briefcase, Layout as LayoutIcon } from 'lucide-react';
 import { meetingAPI } from '../services/api';
 import Layout from '../components/Layout';
 
@@ -97,6 +97,18 @@ const MeetingsPage = () => {
                   <Users size={16} className="text-gray-400" />
                   Organizer: {meeting.organizer?.name || 'Unknown'}
                 </div>
+                {meeting.project && (
+                  <div className="flex items-center gap-3 text-sm font-bold text-indigo-600">
+                    <Briefcase size={16} />
+                    Project: {meeting.project.name}
+                  </div>
+                )}
+                {meeting.workspace && (
+                  <div className="flex items-center gap-3 text-sm font-bold text-emerald-600">
+                    <LayoutIcon size={16} />
+                    Workspace: {meeting.workspace.name}
+                  </div>
+                )}
               </div>
 
               <button 

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { X, Calendar as CalendarIcon, Clock, Type, AlignLeft } from 'lucide-react';
-import { meetingAPI } from '../services/api';
+import { X, Calendar as CalendarIcon, Clock, Type, AlignLeft, Briefcase, Layout as LayoutIcon } from 'lucide-react';
+import { meetingAPI, projectAPI, workspaceAPI } from '../services/api';
 
-const CreateMeetingModal = ({ onClose, onSuccess, initialDate }) => {
+const CreateMeetingModal = ({ onClose, onSuccess, initialDate, defaultProjectId, defaultWorkspaceId }) => {
   const formatDate = (date) => {
     const d = new Date(date);
     const month = String(d.getMonth() + 1).padStart(2, '0');
@@ -15,10 +15,34 @@ const CreateMeetingModal = ({ onClose, onSuccess, initialDate }) => {
     title: '',
     description: '',
     date: initialDate ? formatDate(initialDate) : formatDate(new Date()),
-    time: '12:00'
+    time: '12:00',
+    project: defaultProjectId || '',
+    workspace: defaultWorkspaceId || ''
   });
+  
+  const [projects, setProjects] = useState([]);
+  const [workspaces, setWorkspaces] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [fetchingOptions, setFetchingOptions] = useState(true);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    const fetchOptions = async () => {
+      try {
+        const [{ data: pData }, { data: wData }] = await Promise.all([
+          projectAPI.adminGetAll(),
+          workspaceAPI.getAll()
+        ]);
+        setProjects(pData);
+        setWorkspaces(wData);
+      } catch (err) {
+        console.error('Failed to fetch projects/workspaces', err);
+      } finally {
+        setFetchingOptions(false);
+      }
+    };
+    fetchOptions();
+  }, []);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -35,7 +59,13 @@ const CreateMeetingModal = ({ onClose, onSuccess, initialDate }) => {
 
     setLoading(true);
     try {
-      await meetingAPI.create(formData);
+      // Basic sanitization: send null if empty strings
+      const payload = {
+        ...formData,
+        project: formData.project || undefined,
+        workspace: formData.workspace || undefined
+      };
+      await meetingAPI.create(payload);
       onSuccess();
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to schedule meeting');
@@ -104,6 +134,50 @@ const CreateMeetingModal = ({ onClose, onSuccess, initialDate }) => {
                   className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-sm font-medium text-gray-900 placeholder-gray-400 resize-none"
                   placeholder="Agenda and details..."
                 />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-2">Workspace <span className="text-gray-400 font-normal">(Optional)</span></label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                    <LayoutIcon size={18} />
+                  </div>
+                  <select
+                    name="workspace"
+                    value={formData.workspace}
+                    onChange={handleChange}
+                    className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all font-medium text-gray-900 appearance-none"
+                    disabled={fetchingOptions}
+                  >
+                    <option value="">Choose Workspace</option>
+                    {workspaces.map(ws => (
+                      <option key={ws._id} value={ws._id}>{ws.name}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-2">Project <span className="text-gray-400 font-normal">(Optional)</span></label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                    <Briefcase size={18} />
+                  </div>
+                  <select
+                    name="project"
+                    value={formData.project}
+                    onChange={handleChange}
+                    className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all font-medium text-gray-900 appearance-none"
+                    disabled={fetchingOptions}
+                  >
+                    <option value="">Choose Project</option>
+                    {projects.map(p => (
+                      <option key={p._id} value={p._id}>{p.name}</option>
+                    ))}
+                  </select>
+                </div>
               </div>
             </div>
 
