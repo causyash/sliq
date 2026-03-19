@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { createMeeting, getMeetings } = require('../controllers/meetingController');
-const { protect } = require('../middleware/authMiddleware');
+const { protect } = require('../middlewares/authMiddleware');
 
 router.post('/', protect, createMeeting);
 router.get('/', protect, getMeetings);
