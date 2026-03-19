@@ -9,7 +9,8 @@ import {
   User,
   Layout as LayoutIcon,
   Filter,
-  Video
+  Video,
+  Plus
 } from 'lucide-react';
 import { taskAPI, meetingAPI } from '../services/api';
 import Layout from '../components/Layout';
@@ -92,17 +93,24 @@ const CalendarPage = () => {
       const isToday = new Date().toDateString() === dayDate.toDateString();
 
       days.push(
-        <div key={d} className={`h-32 p-3 border border-gray-100 rounded-3xl transition-all hover:shadow-xl hover:shadow-indigo-50/50 group bg-white ${isToday ? 'ring-2 ring-indigo-500 ring-inset' : ''}`}>
+        <div 
+          key={d} 
+          onClick={() => { setSelectedDate(dayDate); setIsMeetingModalOpen(true); }}
+          className={`h-32 p-3 border border-gray-100 rounded-3xl transition-all hover:shadow-xl hover:shadow-indigo-50/50 group bg-white cursor-pointer ${isToday ? 'ring-2 ring-indigo-500 ring-inset' : ''}`}
+        >
           <div className="flex justify-between items-center mb-2">
             <span className={`text-sm font-black ${isToday ? 'text-indigo-600' : 'text-gray-400 group-hover:text-gray-900'}`}>
               {d}
             </span>
+            <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+              <Plus size={14} className="text-gray-300" />
+            </div>
           </div>
           <div className="space-y-1 overflow-y-auto max-h-20 custom-scrollbar pr-1">
             {dayMeetings.map(meeting => (
               <button 
                 key={meeting._id}
-                onClick={() => navigate(`/meeting/${meeting.roomId}`)}
+                onClick={(e) => { e.stopPropagation(); navigate(`/meeting/${meeting.roomId}`); }}
                 className="w-full text-left px-2 py-1 rounded-lg text-[10px] font-black truncate transition-all active:scale-95 bg-indigo-600 text-white border border-indigo-700 flex items-center gap-1 shadow-sm"
                 title={`Meeting: ${meeting.title} at ${meeting.time}`}
               >
@@ -113,7 +121,7 @@ const CalendarPage = () => {
             {dayTasks.map(task => (
               <button 
                 key={task._id}
-                onClick={() => setSelectedTask(task)}
+                onClick={(e) => { e.stopPropagation(); setSelectedTask(task); }}
                 className={`w-full text-left px-2 py-1 rounded-lg text-[10px] font-bold truncate transition-all active:scale-95 ${
                   task.priority === 'urgent' ? 'bg-red-50 text-red-600 border border-red-100' :
                   task.priority === 'high' ? 'bg-orange-50 text-orange-600 border border-orange-100' :
