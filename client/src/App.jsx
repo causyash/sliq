@@ -9,6 +9,7 @@ import AdminAnalyticsPage from './pages/AdminAnalyticsPage';
 import CalendarPage from './pages/CalendarPage';
 import MeetingsPage from './pages/MeetingsPage';
 import MeetingPage from './pages/MeetingPage';
+import DatabaseDesignPage from './pages/DatabaseDesignPage';
 import './App.css';
 
 // Protected Route component
@@ -68,6 +69,12 @@ function App() {
         <Route path="/admin/analytics" element={
           <ProtectedRoute adminOnly={true}>
             <AdminAnalyticsPage />
+          </ProtectedRoute>
+        } />
+
+        <Route path="/admin/database" element={
+          <ProtectedRoute adminOnly={true}>
+            <DatabaseDesignPage />
           </ProtectedRoute>
         } />
 

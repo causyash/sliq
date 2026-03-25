@@ -22,6 +22,7 @@ import TaskModal from '../components/TaskModal';
 import CreateTaskModal from '../components/CreateTaskModal';
 import CreateMeetingModal from '../components/CreateMeetingModal';
 import ActivityTimeline from '../components/ActivityTimeline';
+import DataTable from '../components/DataTable';
 
 const ProjectPage = () => {
   const { id } = useParams();
@@ -30,7 +31,7 @@ const ProjectPage = () => {
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [view, setView] = useState('kanban'); // 'overview' or 'kanban'
+  const [view, setView] = useState('kanban'); // 'overview', 'kanban', or 'list'
   const [selectedTask, setSelectedTask] = useState(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isMeetingModalOpen, setIsMeetingModalOpen] = useState(false);
@@ -205,6 +206,13 @@ const ProjectPage = () => {
             <LayoutIcon size={18} />
             Kanban Board
           </button>
+          <button 
+            onClick={() => setView('list')}
+            className={`pb-4 px-2 text-sm font-bold transition-all border-b-2 flex items-center gap-2 ${view === 'list' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-400 hover:text-gray-600'}`}
+          >
+            <BarChart3 size={18} className="rotate-90" />
+            List View
+          </button>
         </div>
       </div>
 
@@ -298,13 +306,63 @@ const ProjectPage = () => {
             </div>
           </div>
         </div>
-      ) : (
+      ) : view === 'kanban' ? (
         <div className="mt-8">
           <KanbanBoard 
             tasks={tasks} 
             onTaskUpdate={handleTaskUpdate} 
             onTaskClick={setSelectedTask}
             onAddTask={(status) => openCreateModal(status)}
+          />
+        </div>
+      ) : (
+        <div className="mt-8">
+          <DataTable 
+            columns={[
+              { header: 'Title', accessor: 'title', cell: (row) => (
+                <div className="flex flex-col">
+                  <span className="font-bold text-gray-900 line-clamp-1">{row.title}</span>
+                  <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mt-0.5">{row.description?.slice(0, 50) || 'No description'}</span>
+                </div>
+              )},
+              { header: 'Status', accessor: 'status', cell: (row) => {
+                const colors = {
+                  todo: 'bg-gray-100 text-gray-600',
+                  in_progress: 'bg-blue-100 text-blue-600',
+                  review: 'bg-amber-100 text-amber-600',
+                  done: 'bg-emerald-100 text-emerald-600'
+                };
+                return <span className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest ${colors[row.status] || 'bg-gray-100 text-gray-600'}`}>{row.status?.replace('_', ' ')}</span>
+              }},
+              { header: 'Priority', accessor: 'priority', cell: (row) => {
+                const colors = {
+                  low: 'text-gray-400',
+                  medium: 'text-blue-500',
+                  high: 'text-orange-500',
+                  urgent: 'text-red-500'
+                };
+                return <span className={`text-xs font-bold flex items-center gap-1.5 ${colors[row.priority]}`}>
+                  <div className={`w-1.5 h-1.5 rounded-full bg-current shadow-sm shadow-current/30`}></div>
+                  {row.priority}
+                </span>
+              }},
+              { header: 'Assignee', accessor: 'assignee', cell: (row) => (
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 bg-indigo-50 border border-indigo-100 rounded-lg flex items-center justify-center text-indigo-600 text-xs font-bold uppercase">
+                    {row.assignee?.name?.charAt(0) || '?'}
+                  </div>
+                  <span className="text-xs font-bold text-gray-600">{row.assignee?.name || 'Unassigned'}</span>
+                </div>
+              )},
+              { header: 'Due Date', accessor: 'dueDate', cell: (row) => (
+                <span className="text-xs font-bold text-gray-500 italic">
+                  {row.dueDate ? new Date(row.dueDate).toLocaleDateString() : 'No date'}
+                </span>
+              )}
+            ]}
+            data={tasks}
+            onRowClick={(row) => setSelectedTask(row)}
+            emptyMessage="No tasks found in this project."
           />
         </div>
       )}

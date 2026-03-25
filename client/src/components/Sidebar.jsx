@@ -9,6 +9,7 @@ import {
   Calendar,
   LogOut,
   Video,
+  Database,
   X
 } from 'lucide-react';
 
@@ -20,6 +21,7 @@ const Sidebar = ({ onNavClick }) => {
     ? [
         { name: 'Admin Console', path: '/', icon: <LayoutDashboard size={20} /> },
         { name: 'Analytics', path: '/admin/analytics', icon: <BarChart3 size={20} /> },
+        { name: 'Database Design', path: '/admin/database', icon: <Database size={20} /> },
         { name: 'Calendar', path: '/calendar', icon: <Calendar size={20} /> },
         { name: 'Meetings', path: '/meetings', icon: <Video size={20} /> },
       ]

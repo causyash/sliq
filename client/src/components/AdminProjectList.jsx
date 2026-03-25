@@ -10,11 +10,13 @@ import {
   Clock,
   CheckCircle2,
   AlertCircle,
-  Eye
+  Eye,
+  Database
 } from 'lucide-react';
 import { projectAPI, authAPI } from '../services/api';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import DataTable from './DataTable';
 
 const AdminProjectList = () => {
   const [projects, setProjects] = useState([]);
@@ -91,84 +93,71 @@ const AdminProjectList = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-4">
-        {filteredProjects.map((project) => (
-          <div 
-            key={project._id}
-            className="bg-white border border-gray-100 p-6 rounded-[2.5rem] hover:shadow-xl hover:shadow-indigo-50/20 transition-all group"
-          >
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-              <div className="flex gap-4 items-start">
-                <div className="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center text-gray-400 border border-gray-100 group-hover:bg-indigo-600 group-hover:text-white group-hover:border-indigo-600 transition-all duration-300">
-                  <Layout size={28} />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <Link to={`/projects/${project._id}`} className="hover:text-indigo-600 transition-colors">
-                      <h3 className="text-xl font-black text-gray-900 leading-tight">{project.name}</h3>
-                    </Link>
-                    <span className="px-2 py-0.5 bg-indigo-50 text-indigo-600 text-[10px] font-black uppercase tracking-widest rounded-lg">
-                      {project.workspaceId?.name || 'Global'}
-                    </span>
-                  </div>
-                  <p className="text-gray-500 text-sm line-clamp-1 max-w-md">{project.description || 'No description provided.'}</p>
-                </div>
+      <DataTable 
+        columns={[
+          { header: 'Project Name', accessor: 'name', cell: (row) => (
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600 border border-indigo-100/50">
+                <Layout size={20} />
               </div>
-
-              <div className="flex flex-wrap items-center gap-8">
-                <div className="flex -space-x-2">
-                  {project.members.length > 0 ? (
-                    project.members.map((member, i) => (
-                      <div 
-                        key={member._id}
-                        className="w-8 h-8 rounded-full border-2 border-white bg-indigo-100 flex items-center justify-center text-[10px] font-black text-indigo-700 shadow-sm"
-                        title={`${member.name} (${member.role})`}
-                      >
-                        {member.name.charAt(0).toUpperCase()}
-                      </div>
-                    ))
-                  ) : (
-                    <div className="flex items-center gap-1.5 text-amber-500 bg-amber-50 px-3 py-1 rounded-full border border-amber-100 text-[10px] font-black uppercase tracking-widest">
-                      <AlertCircle size={12} />
-                      Unassigned
-                    </div>
-                  )}
-                </div>
-
-                <div className="flex items-center gap-4 border-l border-gray-100 pl-8">
-                  <button 
-                    onClick={() => {
-                        setSelectedProject(project);
-                        setIsAssignModalOpen(true);
-                    }}
-                    className="flex items-center gap-2 px-5 py-2.5 bg-gray-900 text-white rounded-xl text-xs font-black hover:bg-indigo-600 transition-all shadow-lg active:scale-95"
-                  >
-                    <UserPlus size={16} />
-                    Assign Member
-                  </button>
-                  <Link 
-                    to={`/projects/${project._id}`}
-                    className="flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-100 text-gray-600 rounded-xl text-xs font-black hover:bg-gray-50 transition-all shadow-sm active:scale-95"
-                  >
-                    <Eye size={16} className="text-indigo-600" />
-                    View Status
-                  </Link>
-                  <button className="p-2.5 text-gray-300 hover:text-gray-900 hover:bg-gray-50 rounded-xl transition-all">
-                    <MoreVertical size={20} />
-                  </button>
-                </div>
+              <div>
+                <Link to={`/projects/${row._id}`} className="font-bold text-gray-900 hover:text-indigo-600 transition-colors block leading-tight">{row.name}</Link>
+                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">{row.description?.slice(0, 40) || 'No description'}</p>
               </div>
             </div>
-          </div>
-        ))}
-
-        {filteredProjects.length === 0 && (
-          <div className="text-center p-20 bg-gray-50 rounded-[3rem] border border-dashed border-gray-200">
-            <FolderKanban size={48} className="text-gray-200 mx-auto mb-4" />
-            <p className="text-gray-400 font-bold">No projects found matching your search.</p>
-          </div>
-        )}
-      </div>
+          )},
+          { header: 'Workspace', accessor: 'workspaceId', cell: (row) => (
+            <span className="px-3 py-1.5 bg-gray-50 border border-gray-100 text-gray-600 text-[10px] font-black uppercase tracking-widest rounded-xl">
+              {row.workspaceId?.name || 'Global'}
+            </span>
+          )},
+          { header: 'Team', accessor: 'members', cell: (row) => (
+            <div className="flex -space-x-1.5">
+              {row.members.slice(0, 3).map((member, i) => (
+                <div 
+                  key={member._id}
+                  className="w-7 h-7 rounded-full border-2 border-white bg-indigo-100 flex items-center justify-center text-[10px] font-black text-indigo-700 shadow-sm"
+                  title={member.name}
+                >
+                  {member.name.charAt(0).toUpperCase()}
+                </div>
+              ))}
+              {row.members.length > 3 && (
+                <div className="w-7 h-7 rounded-full border-2 border-white bg-gray-100 flex items-center justify-center text-[8px] font-black text-gray-500 shadow-sm">
+                  +{row.members.length - 3}
+                </div>
+              )}
+              {row.members.length === 0 && <span className="text-[10px] font-bold text-amber-500 uppercase tracking-widest px-2 py-1 bg-amber-50 rounded-lg">Unassigned</span>}
+            </div>
+          )},
+          { header: 'Actions', accessor: '_id', cell: (row) => (
+            <div className="flex items-center gap-2">
+              <button 
+                onClick={() => {
+                  setSelectedProject(row);
+                  setIsAssignModalOpen(true);
+                }}
+                className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"
+                title="Assign Member"
+              >
+                <UserPlus size={18} />
+              </button>
+              <Link 
+                to={`/projects/${row._id}`}
+                className="p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all"
+                title="View Progress"
+              >
+                <Eye size={18} />
+              </Link>
+              <button className="p-2 text-gray-300 hover:text-gray-900 rounded-lg transition-all">
+                <MoreVertical size={18} />
+              </button>
+            </div>
+          )}
+        ]}
+        data={filteredProjects}
+        emptyMessage="No projects found matching your search criteria."
+      />
 
       <AnimatePresence>
         {isAssignModalOpen && (

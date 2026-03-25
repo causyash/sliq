@@ -5,7 +5,9 @@ import { workspaceAPI, projectAPI } from '../services/api';
 import Layout from '../components/Layout';
 import ProjectCard from '../components/ProjectCard';
 import CreateProjectModal from '../components/CreateProjectModal';
+import CreateProjectModal from '../components/CreateProjectModal';
 import CreateMeetingModal from '../components/CreateMeetingModal';
+import DataTable from '../components/DataTable';
 
 const WorkspacePage = () => {
   const { id } = useParams();
@@ -167,19 +169,36 @@ const WorkspacePage = () => {
           <Users size={20} className="text-indigo-600" />
           Team Members
         </h3>
-        <div className="flex flex-wrap gap-4">
-          {workspace.members.map((member) => (
-            <div key={member._id} className="flex items-center gap-3 bg-gray-50 p-3 rounded-2xl pr-6 min-w-[200px]">
-              <div className="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center text-indigo-700 font-bold">
-                {member.name.charAt(0).toUpperCase()}
+        <DataTable 
+          columns={[
+            { header: 'Member', accessor: 'name', cell: (row) => (
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-indigo-50 border border-indigo-100 rounded-xl flex items-center justify-center text-indigo-700 font-black text-sm uppercase">
+                  {row.name.charAt(0)}
+                </div>
+                <div>
+                  <p className="font-bold text-gray-900">{row.name}</p>
+                  <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest leading-none mt-1">{row.email}</p>
+                </div>
               </div>
-              <div>
-                <p className="font-bold text-sm text-gray-900">{member.name}</p>
-                <p className="text-xs text-gray-500">{member.email}</p>
-              </div>
-            </div>
-          ))}
-        </div>
+            )},
+            { header: 'Email Address', accessor: 'email', cell: (row) => (
+              <span className="text-sm font-medium text-gray-500">{row.email}</span>
+            )},
+            { header: 'Access Level', accessor: 'role', cell: (row) => (
+              <span className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest ${row.role === 'admin' ? 'bg-amber-100 text-amber-700' : 'bg-blue-100 text-blue-700'}`}>
+                {row.role || 'Member'}
+              </span>
+            )},
+            { header: 'Joined Date', accessor: 'createdAt', cell: (row) => (
+              <span className="text-xs font-bold text-gray-400 italic">
+                {new Date(row.createdAt).toLocaleDateString()}
+              </span>
+            )}
+          ]}
+          data={workspace.members}
+          emptyMessage="No members in this workspace yet."
+        />
       </div>
 
       {isModalOpen && (

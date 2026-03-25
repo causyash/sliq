@@ -38,8 +38,9 @@ li { margin-bottom: 8px; }
   #document-content { box-shadow: none; width: 100%; border: none; margin: 0; }
   .page-section { box-shadow: none; margin: 0; border: 5px double #333; width: 210mm; height: 297mm; page-break-after: always; break-after: page; position: relative; padding: 25mm 25.4mm 40mm 25.4mm !important; box-sizing: border-box; }
   .action-bar, .btn { display: none !important; }
-  .mermaid { display: block !important; visibility: visible !important; opacity: 1 !important; text-align: center; }
-  .mermaid svg { visibility: visible !important; display: block !important; opacity: 1 !important; max-width: 160mm !important; max-height: 190mm !important; width: auto !important; height: auto !important; margin: 0 auto !important; }
+  .mermaid { display: block !important; visibility: visible !important; opacity: 1 !important; text-align: center; transition: transform 0.3s ease; }
+  .mermaid:hover { transform: scale(1.01); }
+  .mermaid svg { visibility: visible !important; display: block !important; opacity: 1 !important; max-width: 160mm !important; max-height: 190mm !important; width: auto !important; height: auto !important; margin: 0 auto !important; cursor: pointer; }
 }
   </style>
   <script src='https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js'></script>
@@ -47,23 +48,33 @@ li { margin-bottom: 8px; }
     // GLOBAL: cap all mermaid SVG sizes to fit within A4 print area
     function capSvgSizes() {
       document.querySelectorAll('.mermaid svg').forEach(function(svg) {
-        var customHeight = svg.parentElement.getAttribute('data-height') || '185mm';
+        var customHeight = svg.parentElement.getAttribute('data-height') || '200mm';
         svg.removeAttribute('style');
-        svg.style.maxWidth  = '155mm';
+        svg.style.maxWidth  = '160mm'; // Full A4 text width
         svg.style.maxHeight = customHeight;
         svg.style.width     = '100%';
         svg.style.height    = 'auto';
         svg.style.display   = 'block';
         svg.style.margin    = '0 auto';
+        // Force SVG text to be sharper
+        svg.style.textRendering = 'optimizeLegibility';
       });
     }
 
     document.addEventListener('DOMContentLoaded', function() {
       mermaid.initialize({ 
         startOnLoad: true, 
-        theme: 'neutral', 
+        theme: 'base', 
         securityLevel: 'loose',
-        flowchart: { htmlLabels: false, useMaxWidth: true, curve: 'linear' },
+        themeVariables: {
+          fontSize: '15px',
+          fontFamily: 'Inter, sans-serif',
+          nodeBorder: '#333',
+          lineColor: '#2563eb',
+          mainBkg: '#fff',
+          primaryTextColor: '#111'
+        },
+        flowchart: { htmlLabels: true, useMaxWidth: false, curve: 'basis', padding: 20 },
         gitGraph: { mainBranchName: 'main' }
       });
 
@@ -108,13 +119,34 @@ li { margin-bottom: 8px; }
     }
 
     function executeFastPrint() {
-       // Cap all SVG sizes FIRST, then wait for reflow before printing
        capSvgSizes();
-       setTimeout(function() {
-         document.title = ' ';
-         window.print();
-         setTimeout(function() { document.title = 'Sliq System Documentation'; }, 2000);
-       }, 900);
+       
+       function checkContentReady() {
+         return new Promise((resolve) => {
+           let attempts = 0;
+           const check = setInterval(() => {
+             const mDivs = document.querySelectorAll('.mermaid');
+             const allMermaid = Array.from(mDivs).every(div => div.querySelector('svg') !== null);
+             const allImages  = Array.from(document.querySelectorAll('img')).every(img => img.complete);
+             
+             attempts++;
+             if ((allMermaid && allImages) || attempts > 30) {
+               clearInterval(check);
+               console.log("Printing started. Diagrams ready.");
+               resolve();
+             }
+           }, 250);
+         });
+       }
+
+       checkContentReady().then(() => {
+         capSvgSizes();
+         setTimeout(function() {
+           document.title = ' ';
+           window.print();
+           setTimeout(function() { document.title = 'Sliq System Documentation'; }, 2000);
+         }, 4000); // 4 Second solid wait for Chrome print engine
+       });
     }
   </script>
 </head>
@@ -128,18 +160,17 @@ li { margin-bottom: 8px; }
     <div style='margin-top: 10mm;'>
         <div style='display: flex; justify-content: center; align-items: center; gap: 20px; margin-bottom: 20px;'>
             <div style='border: 1px solid #000; padding: 10px; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; font-size: 8pt; font-weight: bold;'>LOGO</div>
-            <h1 style='font-size: 26pt; margin: 0; color: #1e3a8a;'>SDJ INTERNATIONAL COLLEGE</h1>
+            <h1 style='font-size: 26pt; margin: 0; color: #1e3a8a;'>C. B. PATEL COMPUTER COLLEGE</h1>
         </div>
         <h2 style='color: #000; font-size: 16pt; margin: 10px 0;'>Bachelor of Computer Applications (BCA)<br>Program</h2>
         <br><br>
         <h2 style='color: #000; font-size: 22pt; font-weight: bold; text-decoration: underline;'>Project Report</h2>
         <br>
         <h3 style='color: #000; font-size: 18pt; border: none;'>BCA Sem VI<br>AY 2024-25</h3>
-        <br><br><br>
-        <h1 style='font-size: 32pt; font-style: italic; color: #000;'>Project Title: <span style='font-weight: bold;'>SLIQ</span></h1>
-        <br><br>
-        <h3 style='color: #000; border: none; font-size: 16pt;'>By</h3>
         <br>
+        <h1 style='font-size: 28pt; font-style: italic; color: #000;'>Project Title: <span style='font-weight: bold;'>SLIQ</span></h1>
+        <br>
+        <h3 style='color: #000; border: none; font-size: 14pt;'>By</h3>
         <table style='width: 90%; margin: 0 auto; border-collapse: collapse; border: 1.5px solid #000;'>
             <thead>
                 <tr style='background-color: #f8fafc;'>
@@ -150,19 +181,24 @@ li { margin-bottom: 8px; }
             </thead>
             <tbody>
                 <tr>
-                    <td style='border: 1px solid #000; padding: 10px;'>64</td>
-                    <td style='border: 1px solid #000; padding: 10px;'>5395</td>
-                    <td style='border: 1px solid #000; padding: 10px;'>Jariwala Dency Rameshchandra</td>
+                    <td style='border: 1px solid #000; padding: 10px;'>---</td>
+                    <td style='border: 1px solid #000; padding: 10px;'>5258</td>
+                    <td style='border: 1px solid #000; padding: 10px;'>PATEL YASH DIPAKBHAI</td>
                 </tr>
                 <tr>
-                    <td style='border: 1px solid #000; padding: 10px;'>652</td>
-                    <td style='border: 1px solid #000; padding: 10px;'>5862</td>
-                    <td style='border: 1px solid #000; padding: 10px;'>Vesuwala Tisa Mehulbhai</td>
+                    <td style='border: 1px solid #000; padding: 10px;'>---</td>
+                    <td style='border: 1px solid #000; padding: 10px;'>5253</td>
+                    <td style='border: 1px solid #000; padding: 10px;'>PATEL RIYA BHARATBHAI</td>
                 </tr>
                 <tr>
-                    <td style='border: 1px solid #000; padding: 10px;'>563</td>
-                    <td style='border: 1px solid #000; padding: 10px;'>5608</td>
-                    <td style='border: 1px solid #000; padding: 10px;'>Patel Divyanshu Narendrabhai</td>
+                    <td style='border: 1px solid #000; padding: 10px;'>---</td>
+                    <td style='border: 1px solid #000; padding: 10px;'>5270</td>
+                    <td style='border: 1px solid #000; padding: 10px;'>PRAJAPATI HARSHIL NILESHKUMAR</td>
+                </tr>
+                <tr>
+                    <td style='border: 1px solid #000; padding: 10px;'>---</td>
+                    <td style='border: 1px solid #000; padding: 10px;'>5846</td>
+                    <td style='border: 1px solid #000; padding: 10px;'>SARANG MANSI CHANDRAKANTBHAI</td>
                 </tr>
             </tbody>
         </table>
@@ -172,118 +208,194 @@ li { margin-bottom: 8px; }
 </div>
 <div class='page-section no-numbering'><br><br><h1 id='sec-ack'>ACKNOWLEDGEMENT</h1><br><p>The culmination of this academic endeavor would not have been possible without the unwavering support, guidance, and encouragement of numerous individuals to whom I owe a profound debt of gratitude. First and foremost, I wish to extend my deepest appreciation to my project guide and university professors, for their exemplary mentorship, scholarly insights, and constructive feedback throughout the lifecycle of this project. Their academic rigor and practical expertise were instrumental in shaping the architecture and execution of this sophisticated project management platform.</p><p>I am also incredibly grateful to the Head of the Computer Science Department for providing a conducive environment for research and innovation. The state-of-the-art facilities and persistent academic motivation fostered by the department played a vital role in overcoming complex technical challenges encountered during the development phase.</p><p>My sincere thanks go to the teaching faculty and network administrators who indirectly supported this project by ensuring seamless access to necessary infrastructure. I would also like to acknowledge the open-source software community: the developers of Node.js, React.js, Express, MongoDB, and Socket.io, whose comprehensive documentation and robust libraries provided the essential building blocks for this application.</p><p>Furthermore, I wish to express my heartfelt appreciation to my family and friends, whose moral support, patience, and unyielding belief in my capabilities sustained my motivation during extended periods of rigorous coding and debugging. Their emotional backing provided the necessary resilience to navigate the complexities of full-stack development.</p><br><br><br><div style='text-align: right;'><p><strong>________________________</strong></p></div></div>
 <div class='page-section no-numbering' id='sec-toc'>
-    <div class='page-header'><span class='inst'>SDJ INTERNATIONAL COLLEGE</span><span>I N D E X</span></div>
-    <div class='page-footer'><span></span></div><br><br>
+    <div class='page-header'><span class='inst'>C. B. PATEL COMPUTER COLLEGE</span><span>I N D E X</span></div>
+    <div class='page-footer'><span></span></div><br>
     <h1 style='color:#000; text-decoration: underline;'>I N D E X</h1>
-    <table class='toc-table'>
-        <thead>
-            <tr>
-                <th style='width:60px;'>Sr. No</th>
-                <th>Description</th>
-                <th class='page-col'>Page No.</th>
-            </tr>
-        </thead>
+    <table class='toc-table' style='font-size:11pt;'>
+        <thead><tr><th style='width:60px;'>Sr. No</th><th>Description</th><th class='page-col'>Page No.</th></tr></thead>
         <tbody>
-            <tr class='main-sec'><td>1</td><td>Introduction</td><td class='page-col'>1</td></tr>
-            <tr><td></td><td>1.1 Functional Analysis Specifications</td><td class='page-col'>1</td></tr>
-            <tr><td></td><td>1.2 Operational Integration Techniques</td><td class='page-col'>2</td></tr>
-            <tr class='main-sec'><td>2</td><td>Core Definitions</td><td class='page-col'>3</td></tr>
-            <tr><td></td><td>2.1 Problem Statement</td><td class='page-col'>3</td></tr>
-            <tr><td></td><td>2.2 Objectives</td><td class='page-col'>4</td></tr>
-            <tr class='main-sec'><td>3</td><td>System Analysis</td><td class='page-col'>5</td></tr>
-            <tr><td></td><td>3.1 Existing System</td><td class='page-col'>6</td></tr>
-            <tr><td></td><td>3.2 Proposed System</td><td class='page-col'>9</td></tr>
-            <tr class='main-sec'><td>4</td><td>System Design</td><td class='page-col'>10</td></tr>
-            <tr><td></td><td>4.1 System Architecture</td><td class='page-col'>10</td></tr>
-            <tr><td></td><td>4.2 Data Flow Diagrams</td><td class='page-col'>12</td></tr>
-            <tr class='main-sec'><td>5</td><td>Detail Planning</td><td class='page-col'>13</td></tr>
-            <tr><td></td><td>5.1 System Flowcharts</td><td class='page-col'>13</td></tr>
-            <tr><td></td><td>5.2 Database Design</td><td class='page-col'>23</td></tr>
-            <tr class='main-sec'><td>6</td><td>Implementation</td><td class='page-col'>25</td></tr>
-            <tr><td></td><td>6.1 Implementation Details</td><td class='page-col'>25</td></tr>
-            <tr><td></td><td>6.2 Screenshots</td><td class='page-col'>27</td></tr>
-            <tr class='main-sec'><td>7</td><td>Conclusion</td><td class='page-col'>36</td></tr>
-            <tr><td></td><td>7.1 Conclusion & References</td><td class='page-col'>36</td></tr>
+            <tr class='main-sec'><td>1&ndash;7</td><td>System Concept &amp; Analysis</td><td class='page-col'>1&ndash;9</td></tr>
+            <tr class='main-sec'><td>8</td><td>System Architecture</td><td class='page-col'>10</td></tr>
+            <tr><td></td><td>&nbsp;&nbsp;8.1 Components</td><td class='page-col'>10</td></tr>
+            <tr class='main-sec'><td>9</td><td>Data Flow Diagrams</td><td class='page-col'>12</td></tr>
+            <tr><td></td><td>&nbsp;&nbsp;9.1 DFD Level 0 &ndash; Context Diagram</td><td class='page-col'>12</td></tr>
+            <tr><td></td><td>&nbsp;&nbsp;9.2 DFD Level 1 &ndash; Subsystem</td><td class='page-col'>13</td></tr>
+            <tr><td></td><td>&nbsp;&nbsp;9.3 DFD Level 2 &ndash; Task Persistence</td><td class='page-col'>14</td></tr>
+            <tr class='main-sec'><td>10</td><td>System Flowcharts</td><td class='page-col'>15</td></tr>
+            <tr><td></td><td>&nbsp;&nbsp;10.1 Task Lifecycle Protocol</td><td class='page-col'>15</td></tr>
+            <tr><td></td><td>&nbsp;&nbsp;10.2 Workspace Provisioning</td><td class='page-col'>16</td></tr>
+            <tr><td></td><td>&nbsp;&nbsp;10.3 Authentication Gateway</td><td class='page-col'>17</td></tr>
+            <tr><td></td><td>&nbsp;&nbsp;10.4 Team Meeting Handshake</td><td class='page-col'>18</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<div class='page-section no-numbering'>
+    <div class='page-header'><span class='inst'>C. B. PATEL COMPUTER COLLEGE</span><span>I N D E X (Cont.)</span></div>
+    <div class='page-footer'><span></span></div><br>
+    <h1 style='color:#000; text-decoration: underline;'>I N D E X (Continued)</h1>
+    <table class='toc-table' style='font-size:11pt;'>
+        <thead><tr><th style='width:60px;'>Sr. No</th><th>Description</th><th class='page-col'>Page No.</th></tr></thead>
+        <tbody>
+            <tr class='main-sec'><td>11</td><td>Technologies Used</td><td class='page-col'>19</td></tr>
+            <tr class='main-sec'><td>12</td><td>Modules Description</td><td class='page-col'>21</td></tr>
+            <tr class='main-sec'><td>13</td><td>Features</td><td class='page-col'>23</td></tr>
+            <tr class='main-sec'><td>14</td><td>Database Design</td><td class='page-col'>25</td></tr>
+            <tr class='main-sec'><td>15</td><td>Implementation Details</td><td class='page-col'>27</td></tr>
+            <tr class='main-sec'><td>16</td><td>Screenshots</td><td class='page-col'>29</td></tr>
+            <tr class='main-sec'><td>17</td><td>Testing and Results</td><td class='page-col'>30</td></tr>
+            <tr class='main-sec'><td>18</td><td>Advantages</td><td class='page-col'>32</td></tr>
+            <tr class='main-sec'><td>19</td><td>Limitations</td><td class='page-col'>33</td></tr>
+            <tr class='main-sec'><td>20</td><td>Future Enhancements</td><td class='page-col'>34</td></tr>
+            <tr class='main-sec'><td>21</td><td>Conclusion</td><td class='page-col'>35</td></tr>
+            <tr class='main-sec'><td>22</td><td>Bibliography / References</td><td class='page-col'>36</td></tr>
         </tbody>
     </table>
 </div>
 <div id='numbered-sections'>
-<div class='page-section'><div class='page-header'><span class='inst'>SDJ INTERNATIONAL COLLEGE</span><span>INTRODUCTION</span></div><div class='page-footer'><span>Page </span></div><h2 id='sec-1'>1. INTRODUCTION</h2><h3>1.1 Functional Analysis Specifications</h3><div style='text-align:center; margin-bottom: 25px; page-break-inside: avoid;'><img src='./screenshots/cloud_architecture.png' width='480' style='height: auto; max-width: 90%; max-height: 70mm; object-fit: contain; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); border: 1px solid #ddd;' alt='visual'/></div><p>The Express.js routing middleware encapsulates business logic entirely, structurally segregating authorization filters, payload sanitization procedures, and database writes cleanly executing MVC conventions beautifully.</p><p>By leveraging Mongoose ORM models, the backend constructs heavily validated documents before transmitting payload updates into the underlying MongoDB cluster. This preserves absolute data integrity avoiding malicious schema poisoning strictly.</p><ul><li>Executing dynamic state isolation effectively avoiding synchronization drifts naturally.</li><li>Encrypting core socket transmission streams efficiently safely.</li><li>Minimizing DOM mutation loops automatically reliably efficiently accurately appropriately.</li></ul><p>The incorporation of Socket.io event-emitting nodes essentially builds a multiplexed duplex pipeline linking clients actively to corresponding room identifiers explicitly filtering noisy broadcast messages efficiently.</p></div>
+<div class='page-section'><div class='page-header'><span class='inst'>C. B. PATEL COMPUTER COLLEGE</span><span>INTRODUCTION</span></div><div class='page-footer'><span>Page </span></div><h2 id='sec-1'>1. INTRODUCTION</h2><h3>1.1 Functional Analysis Specifications</h3><div style='text-align:center; margin-bottom: 25px; page-break-inside: avoid;'><img src='./screenshots/cloud_architecture.png' width='480' style='height: auto; max-width: 90%; max-height: 70mm; object-fit: contain; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); border: 1px solid #ddd;' alt='visual'/></div><p>The Express.js routing middleware encapsulates business logic entirely, structurally segregating authorization filters, payload sanitization procedures, and database writes cleanly executing MVC conventions beautifully.</p><p>By leveraging Mongoose ORM models, the backend constructs heavily validated documents before transmitting payload updates into the underlying MongoDB cluster. This preserves absolute data integrity avoiding malicious schema poisoning strictly.</p><ul><li>Executing dynamic state isolation effectively avoiding synchronization drifts naturally.</li><li>Encrypting core socket transmission streams efficiently safely.</li><li>Minimizing DOM mutation loops automatically reliably efficiently accurately appropriately.</li></ul><p>The incorporation of Socket.io event-emitting nodes essentially builds a multiplexed duplex pipeline linking clients actively to corresponding room identifiers explicitly filtering noisy broadcast messages efficiently.</p></div>
 <div class='page-section'><div class='page-header'>INTRODUCTION</div><div class='page-footer'><span>Page </span></div><h3>1.2 Operational Integration Techniques</h3><div style='text-align:center; margin-bottom: 25px; page-break-inside: avoid;'><img src='./screenshots/agile_kanban.png' width='480' style='height: auto; max-width: 90%; max-height: 70mm; object-fit: contain; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); border: 1px solid #ddd;' alt='visual'/></div><p>Adopting stateless JSON Web Token (JWT) paradigms inherently allows the application backends to independently manage authorization matrices completely removing central session storage constraints scaling horizontally immensely.</p><p>Database relations represent one-to-many aggregations beautifully across decoupled collections, optimizing query execution pathways while entirely discarding the heavy resource overhead historically demanded by massive relational JOIN clauses.</p><ul><li>Executing dynamic state isolation effectively avoiding synchronization drifts naturally.</li><li>Encrypting core socket transmission streams efficiently safely.</li><li>Minimizing DOM mutation loops automatically reliably efficiently accurately appropriately.</li></ul><p>When a granular task transitions states, the asynchronous API middleware actively initiates an acknowledgement payload communicating instantly to connected web sockets forcing their respective client boards to react accordingly natively.</p></div>
-<div class='page-section'><div class='page-header'><span class='inst'>SDJ INTERNATIONAL COLLEGE</span><span>PROBLEM STATEMENT</span></div><div class='page-footer'><span>Page </span></div><h2 id='sec-2'>2. PROBLEM STATEMENT</h2><h3>2.1 Operational Integration Techniques</h3><div style='text-align:center; margin-bottom: 25px; page-break-inside: avoid;'><img src='./screenshots/data_schema.png' width='480' style='height: auto; max-width: 90%; max-height: 70mm; object-fit: contain; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); border: 1px solid #ddd;' alt='visual'/></div><p>Adopting stateless JSON Web Token (JWT) paradigms inherently allows the application backends to independently manage authorization matrices completely removing central session storage constraints scaling horizontally immensely.</p><p>Database relations represent one-to-many aggregations beautifully across decoupled collections, optimizing query execution pathways while entirely discarding the heavy resource overhead historically demanded by massive relational JOIN clauses.</p><ul><li>Executing dynamic state isolation effectively avoiding synchronization drifts naturally.</li><li>Encrypting core socket transmission streams efficiently safely.</li><li>Minimizing DOM mutation loops automatically reliably efficiently accurately appropriately.</li></ul><p>When a granular task transitions states, the asynchronous API middleware actively initiates an acknowledgement payload communicating instantly to connected web sockets forcing their respective client boards to react accordingly natively.</p></div>
-<div class='page-section'><div class='page-header'><span class='inst'>SDJ INTERNATIONAL COLLEGE</span><span>OBJECTIVES</span></div><div class='page-footer'><span>Page </span></div><h2 id='sec-3'>3. OBJECTIVES</h2><h3>3.1 Security Hardening Metrics</h3><div style='text-align:center; margin-bottom: 25px; page-break-inside: avoid;'><img src='./screenshots/realtime_sockets.png' width='480' style='height: auto; max-width: 90%; max-height: 70mm; object-fit: contain; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); border: 1px solid #ddd;' alt='visual'/></div><p>Controller algorithms aggressively execute atomic transactions assuring that parallel modifications to specific arrays maintain strictly synchronized behaviors gracefully resolving race condition anomalies silently.</p><p>Cryptographic data handling includes injecting pre-save middleware hooks explicitly salting and hashing distinct credentials ensuring compliance with major security conventions seamlessly maintaining user data confidentiality natively.</p><ul><li>Executing dynamic state isolation effectively avoiding synchronization drifts naturally.</li><li>Encrypting core socket transmission streams efficiently safely.</li><li>Minimizing DOM mutation loops automatically reliably efficiently accurately appropriately.</li></ul><p>State inconsistency between remote collaborators is absolutely mitigated by this constant communication vector, functionally translating a standard HTTP system into a remarkably synchronized collaborative ecosystem dependably.</p></div>
-<div class='page-section'><div class='page-header'><span class='inst'>SDJ INTERNATIONAL COLLEGE</span><span>SCOPE OF THE PROJECT</span></div><div class='page-footer'><span>Page </span></div><h2 id='sec-4'>4. SCOPE OF THE PROJECT</h2><h3>4.1 Concurrency & Scalability Benchmarks</h3><div style='text-align:center; margin-bottom: 25px; page-break-inside: avoid;'><img src='./screenshots/auth_security.png' width='480' style='height: auto; max-width: 90%; max-height: 70mm; object-fit: contain; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); border: 1px solid #ddd;' alt='visual'/></div><p>Environment parity is forcefully preserved traversing across local development servers executing parallel to hardened production environments utilizing Dockerized image configurations securely maintaining behavioral constants.</p><p>Historical event logs are persistently recorded onto the database layer ensuring an immutable timeline constructed for detailed auditing activities, effectively tracking asynchronous changes to complex nested attributes sequentially.</p><ul><li>Executing dynamic state isolation effectively avoiding synchronization drifts naturally.</li><li>Encrypting core socket transmission streams efficiently safely.</li><li>Minimizing DOM mutation loops automatically reliably efficiently accurately appropriately.</li></ul><p>Bandwidth optimizations inherently implemented via chunked event streams ensure that payload overheads remain negligible despite extreme concurrent user throughput scaling linearly towards maximal theoretical tolerances securely.</p></div>
-<div class='page-section'><div class='page-header'><span class='inst'>SDJ INTERNATIONAL COLLEGE</span><span>LITERATURE REVIEW</span></div><div class='page-footer'><span>Page </span></div><h2 id='sec-5'>5. LITERATURE REVIEW</h2><h3>5.1 Component Data Flow Schemas</h3><div style='text-align:center; margin-bottom: 25px; page-break-inside: avoid;'><img src='./screenshots/data_analytics.png' width='480' style='height: auto; max-width: 90%; max-height: 70mm; object-fit: contain; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); border: 1px solid #ddd;' alt='visual'/></div><p>The Express.js routing middleware encapsulates business logic entirely, structurally segregating authorization filters, payload sanitization procedures, and database writes cleanly executing MVC conventions beautifully.</p><p>By leveraging Mongoose ORM models, the backend constructs heavily validated documents before transmitting payload updates into the underlying MongoDB cluster. This preserves absolute data integrity avoiding malicious schema poisoning strictly.</p><ul><li>Executing dynamic state isolation effectively avoiding synchronization drifts naturally.</li><li>Encrypting core socket transmission streams efficiently safely.</li><li>Minimizing DOM mutation loops automatically reliably efficiently accurately appropriately.</li></ul><p>The incorporation of Socket.io event-emitting nodes essentially builds a multiplexed duplex pipeline linking clients actively to corresponding room identifiers explicitly filtering noisy broadcast messages efficiently.</p></div>
+<div class='page-section'><div class='page-header'><span class='inst'>C. B. PATEL COMPUTER COLLEGE</span><span>PROBLEM STATEMENT</span></div><div class='page-footer'><span>Page </span></div><h2 id='sec-2'>2. PROBLEM STATEMENT</h2><h3>2.1 Operational Integration Techniques</h3><div style='text-align:center; margin-bottom: 25px; page-break-inside: avoid;'><img src='./screenshots/data_schema.png' width='480' style='height: auto; max-width: 90%; max-height: 70mm; object-fit: contain; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); border: 1px solid #ddd;' alt='visual'/></div><p>Adopting stateless JSON Web Token (JWT) paradigms inherently allows the application backends to independently manage authorization matrices completely removing central session storage constraints scaling horizontally immensely.</p><p>Database relations represent one-to-many aggregations beautifully across decoupled collections, optimizing query execution pathways while entirely discarding the heavy resource overhead historically demanded by massive relational JOIN clauses.</p><ul><li>Executing dynamic state isolation effectively avoiding synchronization drifts naturally.</li><li>Encrypting core socket transmission streams efficiently safely.</li><li>Minimizing DOM mutation loops automatically reliably efficiently accurately appropriately.</li></ul><p>When a granular task transitions states, the asynchronous API middleware actively initiates an acknowledgement payload communicating instantly to connected web sockets forcing their respective client boards to react accordingly natively.</p></div>
+<div class='page-section'><div class='page-header'><span class='inst'>C. B. PATEL COMPUTER COLLEGE</span><span>OBJECTIVES</span></div><div class='page-footer'><span>Page </span></div><h2 id='sec-3'>3. OBJECTIVES</h2><h3>3.1 Security Hardening Metrics</h3><div style='text-align:center; margin-bottom: 25px; page-break-inside: avoid;'><img src='./screenshots/realtime_sockets.png' width='480' style='height: auto; max-width: 90%; max-height: 70mm; object-fit: contain; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); border: 1px solid #ddd;' alt='visual'/></div><p>Controller algorithms aggressively execute atomic transactions assuring that parallel modifications to specific arrays maintain strictly synchronized behaviors gracefully resolving race condition anomalies silently.</p><p>Cryptographic data handling includes injecting pre-save middleware hooks explicitly salting and hashing distinct credentials ensuring compliance with major security conventions seamlessly maintaining user data confidentiality natively.</p><ul><li>Executing dynamic state isolation effectively avoiding synchronization drifts naturally.</li><li>Encrypting core socket transmission streams efficiently safely.</li><li>Minimizing DOM mutation loops automatically reliably efficiently accurately appropriately.</li></ul><p>State inconsistency between remote collaborators is absolutely mitigated by this constant communication vector, functionally translating a standard HTTP system into a remarkably synchronized collaborative ecosystem dependably.</p></div>
+<div class='page-section'><div class='page-header'><span class='inst'>C. B. PATEL COMPUTER COLLEGE</span><span>SCOPE OF THE PROJECT</span></div><div class='page-footer'><span>Page </span></div><h2 id='sec-4'>4. SCOPE OF THE PROJECT</h2><h3>4.1 Concurrency & Scalability Benchmarks</h3><div style='text-align:center; margin-bottom: 25px; page-break-inside: avoid;'><img src='./screenshots/auth_security.png' width='480' style='height: auto; max-width: 90%; max-height: 70mm; object-fit: contain; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); border: 1px solid #ddd;' alt='visual'/></div><p>Environment parity is forcefully preserved traversing across local development servers executing parallel to hardened production environments utilizing Dockerized image configurations securely maintaining behavioral constants.</p><p>Historical event logs are persistently recorded onto the database layer ensuring an immutable timeline constructed for detailed auditing activities, effectively tracking asynchronous changes to complex nested attributes sequentially.</p><ul><li>Executing dynamic state isolation effectively avoiding synchronization drifts naturally.</li><li>Encrypting core socket transmission streams efficiently safely.</li><li>Minimizing DOM mutation loops automatically reliably efficiently accurately appropriately.</li></ul><p>Bandwidth optimizations inherently implemented via chunked event streams ensure that payload overheads remain negligible despite extreme concurrent user throughput scaling linearly towards maximal theoretical tolerances securely.</p></div>
+<div class='page-section'><div class='page-header'><span class='inst'>C. B. PATEL COMPUTER COLLEGE</span><span>LITERATURE REVIEW</span></div><div class='page-footer'><span>Page </span></div><h2 id='sec-5'>5. LITERATURE REVIEW</h2><h3>5.1 Component Data Flow Schemas</h3><div style='text-align:center; margin-bottom: 25px; page-break-inside: avoid;'><img src='./screenshots/data_analytics.png' width='480' style='height: auto; max-width: 90%; max-height: 70mm; object-fit: contain; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); border: 1px solid #ddd;' alt='visual'/></div><p>The Express.js routing middleware encapsulates business logic entirely, structurally segregating authorization filters, payload sanitization procedures, and database writes cleanly executing MVC conventions beautifully.</p><p>By leveraging Mongoose ORM models, the backend constructs heavily validated documents before transmitting payload updates into the underlying MongoDB cluster. This preserves absolute data integrity avoiding malicious schema poisoning strictly.</p><ul><li>Executing dynamic state isolation effectively avoiding synchronization drifts naturally.</li><li>Encrypting core socket transmission streams efficiently safely.</li><li>Minimizing DOM mutation loops automatically reliably efficiently accurately appropriately.</li></ul><p>The incorporation of Socket.io event-emitting nodes essentially builds a multiplexed duplex pipeline linking clients actively to corresponding room identifiers explicitly filtering noisy broadcast messages efficiently.</p></div>
 <div class='page-section'><div class='page-header'>LITERATURE REVIEW</div><div class='page-footer'><span>Page </span></div><h3>5.2 Algorithmic Data Adjustments</h3><div style='text-align:center; margin-bottom: 25px; page-break-inside: avoid;'><img src='./screenshots/system_testing.png' width='480' style='height: auto; max-width: 90%; max-height: 70mm; object-fit: contain; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); border: 1px solid #ddd;' alt='visual'/></div><p>Adopting stateless JSON Web Token (JWT) paradigms inherently allows the application backends to independently manage authorization matrices completely removing central session storage constraints scaling horizontally immensely.</p><p>Database relations represent one-to-many aggregations beautifully across decoupled collections, optimizing query execution pathways while entirely discarding the heavy resource overhead historically demanded by massive relational JOIN clauses.</p><ul><li>Executing dynamic state isolation effectively avoiding synchronization drifts naturally.</li><li>Encrypting core socket transmission streams efficiently safely.</li><li>Minimizing DOM mutation loops automatically reliably efficiently accurately appropriately.</li></ul><p>When a granular task transitions states, the asynchronous API middleware actively initiates an acknowledgement payload communicating instantly to connected web sockets forcing their respective client boards to react accordingly natively.</p></div>
-<div class='page-section'><div class='page-header'><span class='inst'>SDJ INTERNATIONAL COLLEGE</span><span>EXISTING SYSTEM</span></div><div class='page-footer'><span>Page </span></div><h2 id='sec-6'>6. EXISTING SYSTEM</h2><h3>6.1 Algorithmic Data Adjustments</h3><div style='text-align:center; margin-bottom: 25px; page-break-inside: avoid;'><img src='./screenshots/version_control.png' width='480' style='height: auto; max-width: 90%; max-height: 70mm; object-fit: contain; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); border: 1px solid #ddd;' alt='visual'/></div><p>Adopting stateless JSON Web Token (JWT) paradigms inherently allows the application backends to independently manage authorization matrices completely removing central session storage constraints scaling horizontally immensely.</p><p>Database relations represent one-to-many aggregations beautifully across decoupled collections, optimizing query execution pathways while entirely discarding the heavy resource overhead historically demanded by massive relational JOIN clauses.</p><ul><li>Executing dynamic state isolation effectively avoiding synchronization drifts naturally.</li><li>Encrypting core socket transmission streams efficiently safely.</li><li>Minimizing DOM mutation loops automatically reliably efficiently accurately appropriately.</li></ul><p>When a granular task transitions states, the asynchronous API middleware actively initiates an acknowledgement payload communicating instantly to connected web sockets forcing their respective client boards to react accordingly natively.</p></div>
-<div class='page-section'><div class='page-header'><span class='inst'>SDJ INTERNATIONAL COLLEGE</span><span>PROPOSED SYSTEM</span></div><div class='page-footer'><span>Page </span></div><h2 id='sec-7'>7. PROPOSED SYSTEM</h2><h3>7.1 Functional Analysis Specifications</h3><div style='text-align:center; margin-bottom: 25px; page-break-inside: avoid;'><img src='./screenshots/ui_wireframes.png' width='480' style='height: auto; max-width: 90%; max-height: 70mm; object-fit: contain; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); border: 1px solid #ddd;' alt='visual'/></div><p>Controller algorithms aggressively execute atomic transactions assuring that parallel modifications to specific arrays maintain strictly synchronized behaviors gracefully resolving race condition anomalies silently.</p><p>Cryptographic data handling includes injecting pre-save middleware hooks explicitly salting and hashing distinct credentials ensuring compliance with major security conventions seamlessly maintaining user data confidentiality natively.</p><ul><li>Executing dynamic state isolation effectively avoiding synchronization drifts naturally.</li><li>Encrypting core socket transmission streams efficiently safely.</li><li>Minimizing DOM mutation loops automatically reliably efficiently accurately appropriately.</li></ul><p>State inconsistency between remote collaborators is absolutely mitigated by this constant communication vector, functionally translating a standard HTTP system into a remarkably synchronized collaborative ecosystem dependably.</p></div>
-<div class='page-section'><div class='page-header'><span class='inst'>SDJ INTERNATIONAL COLLEGE</span><span>SYSTEM ARCHITECTURE</span></div><div class='page-footer'><span>Page </span></div><h2 id='sec-8'>8. SYSTEM ARCHITECTURE</h2><h3>8.1 Operational Integration Techniques</h3><div style='text-align:center; margin-bottom: 25px; page-break-inside: avoid;'><img src='./screenshots/microservices_api.png' width='480' style='height: auto; max-width: 90%; max-height: 70mm; object-fit: contain; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); border: 1px solid #ddd;' alt='visual'/></div><p>Environment parity is forcefully preserved traversing across local development servers executing parallel to hardened production environments utilizing Dockerized image configurations securely maintaining behavioral constants.</p><p>Historical event logs are persistently recorded onto the database layer ensuring an immutable timeline constructed for detailed auditing activities, effectively tracking asynchronous changes to complex nested attributes sequentially.</p><ul><li>Executing dynamic state isolation effectively avoiding synchronization drifts naturally.</li><li>Encrypting core socket transmission streams efficiently safely.</li><li>Minimizing DOM mutation loops automatically reliably efficiently accurately appropriately.</li></ul><p>Bandwidth optimizations inherently implemented via chunked event streams ensure that payload overheads remain negligible despite extreme concurrent user throughput scaling linearly towards maximal theoretical tolerances securely.</p></div>
+<div class='page-section'><div class='page-header'><span class='inst'>C. B. PATEL COMPUTER COLLEGE</span><span>EXISTING SYSTEM</span></div><div class='page-footer'><span>Page </span></div><h2 id='sec-6'>6. EXISTING SYSTEM</h2><h3>6.1 Algorithmic Data Adjustments</h3><div style='text-align:center; margin-bottom: 25px; page-break-inside: avoid;'><img src='./screenshots/version_control.png' width='480' style='height: auto; max-width: 90%; max-height: 70mm; object-fit: contain; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); border: 1px solid #ddd;' alt='visual'/></div><p>Adopting stateless JSON Web Token (JWT) paradigms inherently allows the application backends to independently manage authorization matrices completely removing central session storage constraints scaling horizontally immensely.</p><p>Database relations represent one-to-many aggregations beautifully across decoupled collections, optimizing query execution pathways while entirely discarding the heavy resource overhead historically demanded by massive relational JOIN clauses.</p><ul><li>Executing dynamic state isolation effectively avoiding synchronization drifts naturally.</li><li>Encrypting core socket transmission streams efficiently safely.</li><li>Minimizing DOM mutation loops automatically reliably efficiently accurately appropriately.</li></ul><p>When a granular task transitions states, the asynchronous API middleware actively initiates an acknowledgement payload communicating instantly to connected web sockets forcing their respective client boards to react accordingly natively.</p></div>
+<div class='page-section'><div class='page-header'><span class='inst'>C. B. PATEL COMPUTER COLLEGE</span><span>PROPOSED SYSTEM</span></div><div class='page-footer'><span>Page </span></div><h2 id='sec-7'>7. PROPOSED SYSTEM</h2><h3>7.1 Functional Analysis Specifications</h3><div style='text-align:center; margin-bottom: 25px; page-break-inside: avoid;'><img src='./screenshots/ui_wireframes.png' width='480' style='height: auto; max-width: 90%; max-height: 70mm; object-fit: contain; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); border: 1px solid #ddd;' alt='visual'/></div><p>Controller algorithms aggressively execute atomic transactions assuring that parallel modifications to specific arrays maintain strictly synchronized behaviors gracefully resolving race condition anomalies silently.</p><p>Cryptographic data handling includes injecting pre-save middleware hooks explicitly salting and hashing distinct credentials ensuring compliance with major security conventions seamlessly maintaining user data confidentiality natively.</p><ul><li>Executing dynamic state isolation effectively avoiding synchronization drifts naturally.</li><li>Encrypting core socket transmission streams efficiently safely.</li><li>Minimizing DOM mutation loops automatically reliably efficiently accurately appropriately.</li></ul><p>State inconsistency between remote collaborators is absolutely mitigated by this constant communication vector, functionally translating a standard HTTP system into a remarkably synchronized collaborative ecosystem dependably.</p></div>
+<div class='page-section'><div class='page-header'><span class='inst'>C. B. PATEL COMPUTER COLLEGE</span><span>SYSTEM ARCHITECTURE</span></div><div class='page-footer'><span>Page </span></div><h2 id='sec-8'>8. SYSTEM ARCHITECTURE</h2><h3>8.1 Operational Integration Techniques</h3><div style='text-align:center; margin-bottom: 25px; page-break-inside: avoid;'><img src='./screenshots/microservices_api.png' width='480' style='height: auto; max-width: 90%; max-height: 70mm; object-fit: contain; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); border: 1px solid #ddd;' alt='visual'/></div><p>Environment parity is forcefully preserved traversing across local development servers executing parallel to hardened production environments utilizing Dockerized image configurations securely maintaining behavioral constants.</p><p>Historical event logs are persistently recorded onto the database layer ensuring an immutable timeline constructed for detailed auditing activities, effectively tracking asynchronous changes to complex nested attributes sequentially.</p><ul><li>Executing dynamic state isolation effectively avoiding synchronization drifts naturally.</li><li>Encrypting core socket transmission streams efficiently safely.</li><li>Minimizing DOM mutation loops automatically reliably efficiently accurately appropriately.</li></ul><p>Bandwidth optimizations inherently implemented via chunked event streams ensure that payload overheads remain negligible despite extreme concurrent user throughput scaling linearly towards maximal theoretical tolerances securely.</p></div>
 <div class='page-section'><div class='page-header'>SYSTEM ARCHITECTURE</div><div class='page-footer'><span>Page </span></div><h3>8.2 Security Hardening Metrics</h3><div style='text-align:center; margin-bottom: 25px; page-break-inside: avoid;'><img src='./screenshots/devops_pipeline.png' width='480' style='height: auto; max-width: 90%; max-height: 70mm; object-fit: contain; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); border: 1px solid #ddd;' alt='visual'/></div><p>The Express.js routing middleware encapsulates business logic entirely, structurally segregating authorization filters, payload sanitization procedures, and database writes cleanly executing MVC conventions beautifully.</p><p>By leveraging Mongoose ORM models, the backend constructs heavily validated documents before transmitting payload updates into the underlying MongoDB cluster. This preserves absolute data integrity avoiding malicious schema poisoning strictly.</p><ul><li>Executing dynamic state isolation effectively avoiding synchronization drifts naturally.</li><li>Encrypting core socket transmission streams efficiently safely.</li><li>Minimizing DOM mutation loops automatically reliably efficiently accurately appropriately.</li></ul><p>The incorporation of Socket.io event-emitting nodes essentially builds a multiplexed duplex pipeline linking clients actively to corresponding room identifiers explicitly filtering noisy broadcast messages efficiently.</p></div>
-<div class='page-section'><div class='page-header'><span class='inst'>SDJ INTERNATIONAL COLLEGE</span><span>DATA FLOW DIAGRAMS</span></div><div class='page-footer'><span>Page </span></div><h2 id='sec-9'>9. DATA FLOW DIAGRAMS</h2><h3>9.1 System Data Orchestration Workflow</h3>
+<div class='page-section'><div class='page-header'><span class='inst'>C. B. PATEL COMPUTER COLLEGE</span><span>DATA FLOW DIAGRAMS</span></div><div class='page-footer'><span>Page </span></div><h2 id='sec-9'>9. DATA FLOW DIAGRAMS</h2>
+<h3>9.1 DFD Level 0: Context Diagram</h3>
+<p>The Level 0 Context Diagram establishes the global boundary of the SLIQ system, identifying all external entities and the primary data flows between them and the core application process.</p>
 <div class='mermaid' style='width: 100%; height: auto;'>
 graph LR
-    classDef client fill:#e3f2fd,stroke:#1565c0,stroke-width:2px;
-    classDef server fill:#fff,stroke:#333,stroke-width:2px;
-    classDef db fill:#f1f8e9,stroke:#558b2f,stroke-width:2px;
+    classDef entity fill:#e3f2fd,stroke:#1565c0,stroke-width:3px,color:#000;
+    classDef process fill:#fff9c4,stroke:#fbc02d,stroke-width:3px,color:#000;
+    classDef store fill:#f1f8e9,stroke:#558b2f,stroke-width:3px,color:#000;
 
-    subgraph Client_Layer [Frontend: React.js]
-        U((Authorized User)):::client
-        SocketClient[Socket.io Client]:::client
+    User((Registered Student/User)):::entity
+    Admin((System Administrator)):::entity
+    System[("SLIQ MANAGEMENT SYSTEM (Process 0.0)")]:::process
+    DB[(MongoDB Atlas Persistence)]:::store
+    Notif[[Push Notification Service]]:::entity
+
+    User -- "Login Credentials / JWT Request" --> System
+    System -- "Auth Token / Dashboard State" --> User
+    User -- "Task UPD / CRUD Actions" --> System
+    System -- "Real-time State Updates" --> User
+
+    Admin -- "User Management / Metrics Req" --> System
+    System -- "Analytics Reports / Auth Logs" --> Admin
+    
+    System -- "Mongoose Document Writes" --> DB
+    DB -- "Query Results / Aggregates" --> System
+    
+    System -- "Event Trigger" --> Notif
+</div>
+<p style='margin-top:20px;'>This high-level view demonstrates how the SLIQ system acts as an orchestrator between external users, persistent cloud storage, and real-time triggers.</p>
+</div>
+
+<div class='page-section'><div class='page-header'>DATA FLOW DIAGRAMS</div><div class='page-footer'><span>Page </span></div>
+<h3>9.2 DFD Level 1: Major Subsystem Processes</h3>
+<p>The Level 1 diagram decomposes the SLIQ system into its constituent functional modules, tracing the flow of data through Authentication, Workspace Management, and real-time Task Synchronization.</p>
+<div class='mermaid' style='width: 100%;'>
+graph TD
+    classDef p fill:#f3e5f5,stroke:#7b1fa2,stroke-width:3px,color:#000;
+    classDef s fill:#e8f5e9,stroke:#2e7d32,stroke-width:3px,color:#000;
+    classDef e fill:#e3f2fd,stroke:#1565c0,stroke-width:3px,color:#000;
+
+    User((User)):::e
+    
+    subgraph System_Processes
+        P1[1.0 Authentication & Session]:::p
+        P2[2.0 Workspace Orchestration]:::p
+        P3[3.0 Task & Project Logic]:::p
+        P4[4.0 Real-time Socket Sync]:::p
     end
+    
+    D1[(User Profile Store)]:::s
+    D2[(Workspace & RBAC Store)]:::s
+    D3[(Task & Activity Store)]:::s
+    
+    User -- "Login Info" --> P1
+    P1 -- "Validate" --> D1
+    D1 -- "ID/Role" --> P1
+    P1 -- "JWT Response" --> User
+    
+    P1 -- "Authorized Access" --> P2
+    P2 -- "CRUD Workspace" --> D2
+    D2 -- "Workspace Data" --> P2
+    P2 -- "Render UI" --> User
+    
+    P2 -- "Context Pointer" --> P3
+    P3 -- "CRUD Task/Kanban" --> D3
+    D3 -- "Task State" --> P3
+    P3 -- "Status Success" --> User
+    
+    P3 -- "Change Event" --> P4
+    P4 -- "Socket Emit" --> User
+</div>
+</div>
 
-    subgraph Server_Layer [Backend: Express.js]
-        API[Auth & Data Gateway]:::server
-        WS[Real-time Events]:::server
-    end
+<div class='page-section'><div class='page-header'>DATA FLOW DIAGRAMS</div><div class='page-footer'><span>Page </span></div>
+<h3>9.3 DFD Level 2: Task Transition & Real-time Persistence</h3>
+<p>The Level 2 diagram drills down into the Task Management subsystem (Process 3.0), illustrating the atomic data movements during a Kanban card transition from 'In Progress' to 'Done'.</p>
+<div class='mermaid' data-height='150mm' style='width: 100%;'>
+graph TD
+    classDef sp fill:#fff3e0,stroke:#ef6c00,stroke-width:3px,color:#000;
+    classDef db fill:#f1f8e9,stroke:#388e3c,stroke-width:3px,color:#000;
 
-    subgraph Data_Layer [Cloud Persistence]
-        DB[(MongoDB Atlas)]:::db
-    end
+    Event([User Drags Kanban Card]) --> P3_1[3.1 Map Target Status ID]:::sp
+    P3_1 -- "Optimistic UI Update" --> Client([Local Store Refresh])
+    P3_1 -- "PUT /api/tasks/:id" --> P3_2[3.2 API Middleware Validation]:::sp
+    
+    P3_2 -- "Check Admin Permissions" --> P3_3[3.3 Atomic DB Update]:::sp
+    P3_3 -- "$set: { status: 'DONE' }" --> TStore[(Tasks Collection)]:::db
+    TStore -- "Ack" --> P3_3
+    
+    P3_3 -- "Success Response" --> P3_4[3.4 Activity Logger]:::sp
+    P3_4 -- "Insert Activity Record" --> AStore[(Activity Collection)]:::db
+    
+    P3_3 -- "Payload: {taskId, status}" --> P3_5[3.5 Socket Gateway]:::sp
+    P3_5 -- "io.to(workspaceID).emit('taskMoved')" --> AllUsers((Other Members))
+</div>
+</div>
+<div class='page-section'><div class='page-header'><span class='inst'>C. B. PATEL COMPUTER COLLEGE</span><span>SYSTEM FLOWCHARTS</span></div><div class='page-footer'><span>Page </span></div><h2 id='sec-10'>10. SYSTEM FLOWCHARTS</h2><p style='margin-bottom:10px;'>The operational logic of Sliq is governed by state-machines ensuring real-time synchronization and data integrity.</p>
 
-    U -- "1. HTTPS Request (JWT)" --> API
-    API -- "2. Mongoose Validation" --> DB
-    DB -- "3. Persistence Result" --> API
-    API -- "4. Status: 200 OK" --> U
-    API -- "5. Local State Update" --> WS
-    WS -- "6. WebSocket Push (JSON)" --> SocketClient
-    SocketClient -- "7. DOM Hydration" --> U
-</div></div></div>
-<div class='page-section'><div class='page-header'><span class='inst'>SDJ INTERNATIONAL COLLEGE</span><span>SYSTEM FLOWCHARTS</span></div><div class='page-footer'><span>Page </span></div><h2 id='sec-10'>10. SYSTEM FLOWCHARTS</h2><p>The operational logic of Sliq is governed by a series of state-machines and provisioning workflows that ensure real-time synchronization and data integrity.</p>
-
-<div class='diagram-container'>
-    <h3>10.1 Task Lifecycle Protocol</h3>
-    <p>The following state-machine illustrates the complete iterative lifecycle of a task, from project inception through validation, execution, review cycles, and final archival within the Sliq system.</p>
-    <div class='mermaid' data-height='140mm' style='width:100%;'>
+<div class='diagram-container' style='margin-top:0;'>
+    <h3 style='margin-top:0;'>10.1 Task Lifecycle Protocol</h3>
+    <div class='mermaid' data-height='130mm' style='width:100%;'>
     graph TD
-        classDef state fill:#e8f4fd,stroke:#0056b3,stroke-width:2px;
-        classDef trigger fill:#fff3e0,stroke:#e65100,stroke-width:2px;
-        classDef done fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px;
+        classDef start fill:#4f46e5,stroke:#3730a3,color:#fff,font-weight:bold;
+        classDef process fill:#f8fafc,stroke:#6366f1,stroke-width:3px;
+        classDef decision fill:#fffbeb,stroke:#d97706,stroke-width:3px;
+        classDef finish fill:#ecfdf5,stroke:#059669,stroke-width:3px;
 
-        S(["Project Inception"]) --> Init["Create New Task Object"]
-        Init --> SetMeta["Set Title, Description, Priority"]:::state
-        SetMeta --> AssignBoard["Attach to Project Board"]:::state
-        AssignBoard --> TODO["Status: TO-DO"]:::state
+        S([START: Task Creation]):::start --> P1[Input Title & Priority]:::process
+        P1 --> P2[Attach Requirement Docs]:::process
+        P2 --> D1{Validated?}:::decision
+        D1 -- No --> P1
+        D1 -- Yes --> P3[Post to TO-DO Column]:::process
 
-        TODO --> Claim{"Dev Claims Task?"}:::trigger
-        Claim -->|Yes| SetAssignee["Assign Developer"]:::state
-        Claim -->|No| Backlog["Return to Backlog"]
-        Backlog --> TODO
+        subgraph Development_Phase
+            P3 --> D2{Dev Claim?}:::decision
+            D2 -- Yes --> P4[Assign Member & Shift to In-Progress]:::process
+            D2 -- No --> P3
+            P4 --> P5[Execute Subtask Checklist]:::process
+            P5 --> P6[Push to GitHub/VCS]:::process
+        end
 
-        SetAssignee --> IP["Status: IN PROGRESS"]:::state
-        IP --> SubCheck{"Subtasks Defined?"}:::trigger
-        SubCheck -->|Yes| SubWork["Complete Subtask Checklist"]:::state
-        SubCheck -->|No| Commit["Push Code Commit"]
-        SubWork --> Commit
+        subgraph Review_Phase
+            P6 --> P7[Open Peer Pull Request]:::process
+            P7 --> D3{Review Pass?}:::decision
+            D3 -- Changes Needed --> P5
+            D3 -- LGTM --> P8[Merge to Main & Deploy]:::process
+        end
 
-        Commit --> PR["Open Pull Request"]:::state
-        PR --> Review{"PR Review Pass?"}:::trigger
-        Review -->|Changes Needed| Revise["Revise and Re-push"]:::state
-        Revise --> PR
-        Review -->|LGTM| Merge["Merge to Main Branch"]:::done
-
-        Merge --> Done["Status: COMPLETED"]:::done
-        Done --> Notify["Notify Workspace Members"]:::state
-        Notify --> Archive(["Archive Task Card"])
+        P8 --> F([FINISH: Archived]):::finish
+        
+        style Development_Phase fill:#f5f3ff,stroke:#ddd,stroke-dasharray: 5 5
+        style Review_Phase fill:#f0fdf4,stroke:#ddd,stroke-dasharray: 5 5
     </div>
 </div>
 </div>
@@ -291,125 +403,121 @@ graph LR
 <div class='page-section'><div class='page-header'>FLOWCHARTS</div><div class='page-footer'><span>Page </span></div>
 <div class='diagram-container'>
     <h3>10.2 Global Workspace Provisioning</h3>
-    <p>This workflow manages the atomic creation of collaborative environments, ensuring RBAC, database indexing, and socket subscriptions are fully established before any user accesses the workspace.</p>
-    <div class='mermaid' style='width:100%;'>
+    <p>This workflow manages the atomic creation of collaborative environments, ensuring RBAC, database indexing, and socket subscriptions are fully established.</p>
+    <div class='mermaid' data-height='160mm' style='width:100%;'>
     graph TD
-        classDef node fill:#e3f2fd,stroke:#2563eb,stroke-width:2px;
-        classDef decision fill:#eef2ff,stroke:#1e40af,stroke-width:2px;
-        classDef api fill:#f1f5f9,stroke:#64748b,stroke-width:1px;
-        classDef error fill:#fce4ec,stroke:#c62828,stroke-width:2px;
+        classDef blue fill:#eff6ff,stroke:#2563eb,stroke-width:3px;
+        classDef orange fill:#fff7ed,stroke:#ea580c,stroke-width:3px;
+        classDef green fill:#f0fdf4,stroke:#16a34a,stroke-width:3px;
 
-        S([User Initiates Login]) --> JWTCheck{JWT Token Valid?}:::decision
-        JWTCheck -- No --> Refresh[Request Token Refresh]:::api
-        Refresh --> JWTCheck
-        JWTCheck -- Yes --> Fetch[Fetch User Workspace List]:::node
+        Start([Initiate Setup]) --> Input[Workspace Name & Slug]:::blue
+        Input --> Valid{Valid Slug?}:::orange
+        Valid -- No --> Input
+        Valid -- Yes --> Pay[Process Subscription if applicable]:::blue
 
-        Fetch --> SelWS[Select or Create Workspace]:::node
-        SelWS --> NewWS{Creating New?}:::decision
-        NewWS -- No --> LoadWS[Load Existing Workspace]:::node
-        NewWS -- Yes --> ValidName{Name Unique?}:::decision
-        ValidName -- No --> NameErr((Name Conflict Error)):::error
-        ValidName -- Yes --> Payload[Sanitize and Validate API Payload]:::api
+        subgraph Database_Layer
+            Pay --> D1[Create MongoDB Collection Partition]:::green
+            D1 --> D2[Apply Unique Indexing Constraints]:::green
+            D2 --> D3[Initialize RBAC Permissions]:::green
+        end
 
-        Payload --> PersistDB[(Persist Workspace to MongoDB)]:::node
-        PersistDB --> IndexDB[Trigger Atlas Index Update]:::api
-        IndexDB --> RBACInit[Initialize RBAC Permission Model]:::node
-        RBACInit --> InviteMembers[Generate Member Invitation Tokens]:::node
-        InviteMembers --> SocketRoom[Create Socket.io Room]:::api
-        SocketRoom --> BroadcastJoin[Emit join-workspace Event]:::node
+        subgraph Network_Layer
+            D3 --> N1[Generate WebSocket Namespace]:::blue
+            N1 --> N2[Subscribe Admin Socket ID]:::blue
+            N2 --> N3[Generate Invite Token Hash]:::blue
+        end
 
-        LoadWS --> SocketRoom
-        BroadcastJoin --> Dashboard([Render Live Workspace Dashboard])
+        N3 --> Ready[Render System Dashboard]:::green
+        Ready --> End([Workspace LIVE]):::green
+
+        style Database_Layer fill:#f8fafc,stroke:#ccc
+        style Network_Layer fill:#f8fafc,stroke:#ccc
     </div>
 </div>
 </div>
 
 <div class='page-section'><div class='page-header'>FLOWCHARTS</div><div class='page-footer'><span>Page </span></div>
 <div class='diagram-container'>
-    <h3>10.3 Project Onboarding &amp; Sprint Mapping</h3>
-    <p>The project onboarding protocol bridges organizational strategy with functional execution, configuring access controls, sprint parameters, Kanban columns, and member permissions before the first task is created.</p>
-    <div class='mermaid' style='width:100%;'>
+    <h3>10.3 Authentication Gateway & Secure Session</h3>
+    <p>Detailed verification path for User Authorization, involving JWT hashing, Bcrypt comparisons, and stateless session persistence.</p>
+    <div class='mermaid' data-height='150mm' style='width:100%;'>
     graph TD
-        classDef stage fill:#fff8e1,stroke:#f9a825,stroke-width:2px;
-        classDef gate fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px;
-        classDef data fill:#e8f5e9,stroke:#388e3c,stroke-width:2px;
+        classDef c fill:#f0f9ff,stroke:#0ea5e9,stroke-width:3px;
+        classDef s fill:#fff7ed,stroke:#f97316,stroke-width:3px;
+        classDef db fill:#f1f8e9,stroke:#65a30d,stroke-width:3px;
 
-        A([Admin Creates Project]) --> SetID[Generate Unique Project ID]:::data
-        SetID --> Meta[Configure Project Metadata]:::stage
-        Meta --> SetDates[Set Start and Deadline Dates]:::stage
-        SetDates --> ValidParam{Valid Parameters?}:::gate
-        ValidParam -- No --> FixParam[Return Validation Error]
-        FixParam --> Meta
-        ValidParam -- Yes --> PrivCheck{Access Type?}:::gate
+        Login([User Submits Form]):::c --> Encrypt[Bcrypt Hash Comparison]:::s
+        Encrypt --> DBCheck{Record Found?}:::s
+        DBCheck -- No --> Error[Throw 401 Unauthorized]:::s
+        DBCheck -- Yes --> Sign[Generate HMAC-256 JWT]:::s
 
-        PrivCheck -- Private --> SelectTeam[Manually Select Members]:::stage
-        PrivCheck -- Public --> InviteOrg[Invite All Org Members]:::stage
-        PrivCheck -- Restricted --> DefineRoles[Assign Role-based Access]:::stage
+        subgraph Client_Storage
+            Sign --> Store[Persist to LocalStorage]:::c
+            Store --> Attach[Attach to HTTP Header]:::c
+        end
 
-        SelectTeam --> SprintCfg[Configure Sprint Parameters]:::stage
-        InviteOrg --> SprintCfg
-        DefineRoles --> SprintCfg
+        Attach --> Guard{Middleware Guard}:::s
+        Guard -- Valid Token --> Access[Grant API Access]:::s
+        Guard -- Expired --> Refresh[Trigger Refresh Cycle]:::s
+        
+        Access --> Profile[Load React Context Provider]:::c
+        Profile --> UI[Render Secure Layout]:::c
 
-        SprintCfg --> SetVelocity[Set Team Velocity Target]:::data
-        SetVelocity --> KanbanMap[Map Kanban Board Columns]:::stage
-        KanbanMap --> SetCols[Define To-Do, In-Progress, Done Lanes]:::stage
-        SetCols --> InitSync[Run Initial Data Synchronization]:::data
-        InitSync --> NotifyMembers[Notify All Assigned Members]:::stage
-        NotifyMembers --> Ready([Sprint Execution Begins])
+        style Client_Storage fill:#fcfcfc,stroke:#eee
     </div>
 </div>
 </div>
 
 <div class='page-section'><div class='page-header'>FLOWCHARTS</div><div class='page-footer'><span>Page </span></div>
 <div class='diagram-container'>
-    <h3>10.4 Real-time Meeting &amp; Communication Sync</h3>
-    <p>This protocol governs the full lifecycle of a live collaborative session, from JWT room generation through socket handshakes, participant state tracking, and graceful session teardown with audit logging.</p>
-    <div class='mermaid' style='width:100%;'>
+    <h3>10.4 Team Meeting Handshake (WebRTCSync)</h3>
+    <p>This flowchart illustrates the complex real-time negotiation required for synchronous voice/video collaboration within the Sliq workspace.</p>
+    <div class='mermaid' data-height='150mm' style='width:100%;'>
     graph TD
-        classDef socket fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px;
-        classDef state fill:#e8eaf6,stroke:#3949ab,stroke-width:2px;
-        classDef action fill:#fff3e0,stroke:#e65100,stroke-width:2px;
+        classDef u fill:#fff,stroke:#333,stroke-width:3px;
+        classDef n fill:#eef2ff,stroke:#4338ca,stroke-width:3px;
+        classDef w fill:#fdf4ff,stroke:#a21caf,stroke-width:3px;
 
-        A([User Triggers Meeting]) --> GenRoom[Generate Unique Room ID]:::socket
-        GenRoom --> JWTRoom[Issue JWT Room Token]:::socket
-        JWTRoom --> WSConnect[Establish WebSocket Connection]:::state
+        U1((User A)):::u -- "1. Join Call" --> Hub[Socket.io Signaling Server]:::n
+        Hub -- "2. Notify Members" --> U2((User B)):::u
+        
+        subgraph Negotiation_Cycle
+            U2 -- "3. Create Offer" --> Hub
+            Hub -- "4. Relay Offer" --> U1
+            U1 -- "5. Create Answer" --> Hub
+            Hub -- "6. Relay Answer" --> U2
+        end
 
-        WSConnect --> HandshakeOK{Handshake Verified?}:::socket
-        HandshakeOK -- Fail --> RetryConn[Retry Connection 3x]:::action
-        RetryConn --> WSConnect
-        HandshakeOK -- Yes --> EmitStart[Emit MEET_START Event]:::socket
+        subgraph ICE_Trickle
+            U1 -- "Candidate Info" --> Hub
+            U2 -- "Candidate Info" --> Hub
+        end
 
-        EmitStart --> BroadcastRoom[Broadcast to Room Participants]:::state
-        BroadcastRoom --> CheckOnline{Participant Online?}:::socket
-        CheckOnline -- Yes --> ShowAlert[Display Meeting Alert Overlay]:::action
-        CheckOnline -- No --> QueueNotif[Queue Push Notification]:::action
+        Negotiation_Cycle --> P2P{P2P Established?}:::n
+        P2P -- Yes --> Stream[Bi-Directional Media Stream]:::w
+        P2P -- No --> Hub
+        
+        Stream --> HUD[Update UI Participant List]:::w
+        HUD --> Rec[Optional: Cloud Recording Init]:::n
 
-        ShowAlert --> JoinMeeting[Participant Joins Session]:::state
-        QueueNotif --> LogHistory[Log to Notification History]:::state
-
-        JoinMeeting --> SyncCanvas[Synchronize Canvas State]:::socket
-        SyncCanvas --> StreamData[Stream Real-time Updates]:::state
-        StreamData --> EndCheck{Meeting Ended?}:::socket
-        EndCheck -- No --> StreamData
-        EndCheck -- Yes --> EmitEnd[Emit MEET_END Event]:::socket
-        EmitEnd --> CloseRoom[Close Socket Room]:::state
-        CloseRoom --> Done([Session Archived])
+        style Negotiation_Cycle fill:#fafafa,stroke:#ddd
+        style ICE_Trickle fill:#fafafa,stroke:#ddd
     </div>
 </div>
 </div>
-<div class='page-section'><div class='page-header'><span class='inst'>SDJ INTERNATIONAL COLLEGE</span><span>TECHNOLOGIES USED</span></div><div class='page-footer'><span>Page </span></div><h2 id='sec-11'>11. TECHNOLOGIES USED</h2><h3>11.1 Component Data Flow Schemas</h3><p>The programmatic foundation comprises entirely modern Javascript frameworks rendering efficient platforms universally accurately effectively successfully systematically inherently dynamically beautifully flexibly robustly securely.</p><div class='tech-row'><div style='flex-shrink:0;'><img src='https://upload.wikimedia.org/wikipedia/commons/a/a7/React-icon.svg' width='40' class='tech-logo'></div><div><strong>React.js</strong><p>Virtually DOM managed UI rendering constructing highly scalable encapsulated interactive visual trees natively.</p></div></div><div class='tech-row'><div style='flex-shrink:0;'><img src='https://upload.wikimedia.org/wikipedia/commons/d/d9/Node.js_logo.svg' width='40' class='tech-logo'></div><div><strong>Node.js</strong><p>Event-driven asynchronous backend runtime executing Google’s V8 JavaScript Engine efficiently bypassing thread-blocking limitations.</p></div></div><h3>11.1.1 Auxiliary Execution Layer</h3><p>Complex modular views, ranging from interactive dashboards to multi-parameter reporting tools, rely on a strongly typed layout that efficiently encapsulates nested hierarchies avoiding widespread css pollution entirely.</p><p>Environment parity is forcefully preserved traversing across local development servers executing parallel to hardened production environments utilizing Dockerized image configurations securely maintaining behavioral constants.</p></div>
+<div class='page-section'><div class='page-header'><span class='inst'>C. B. PATEL COMPUTER COLLEGE</span><span>TECHNOLOGIES USED</span></div><div class='page-footer'><span>Page </span></div><h2 id='sec-11'>11. TECHNOLOGIES USED</h2><h3>11.1 Component Data Flow Schemas</h3><p>The programmatic foundation comprises entirely modern Javascript frameworks rendering efficient platforms universally accurately effectively successfully systematically inherently dynamically beautifully flexibly robustly securely.</p><div class='tech-row'><div style='flex-shrink:0;'><img src='https://upload.wikimedia.org/wikipedia/commons/a/a7/React-icon.svg' width='40' class='tech-logo'></div><div><strong>React.js</strong><p>Virtually DOM managed UI rendering constructing highly scalable encapsulated interactive visual trees natively.</p></div></div><div class='tech-row'><div style='flex-shrink:0;'><img src='https://upload.wikimedia.org/wikipedia/commons/d/d9/Node.js_logo.svg' width='40' class='tech-logo'></div><div><strong>Node.js</strong><p>Event-driven asynchronous backend runtime executing Google’s V8 JavaScript Engine efficiently bypassing thread-blocking limitations.</p></div></div><h3>11.1.1 Auxiliary Execution Layer</h3><p>Complex modular views, ranging from interactive dashboards to multi-parameter reporting tools, rely on a strongly typed layout that efficiently encapsulates nested hierarchies avoiding widespread css pollution entirely.</p><p>Environment parity is forcefully preserved traversing across local development servers executing parallel to hardened production environments utilizing Dockerized image configurations securely maintaining behavioral constants.</p></div>
 <div class='page-section'><div class='page-header'>TECHNOLOGIES USED</div><div class='page-footer'><span>Page </span></div><h3>11.2 Algorithmic Data Adjustments</h3><p>The programmatic foundation comprises entirely modern Javascript frameworks rendering efficient platforms universally accurately effectively successfully systematically inherently dynamically beautifully flexibly robustly securely.</p><div class='tech-row'><div style='flex-shrink:0;'><img src='https://upload.wikimedia.org/wikipedia/commons/9/93/MongoDB_Logo.svg' width='40' class='tech-logo'></div><div><strong>MongoDB</strong><p>NoSQL document persistence datastore designed for exclusively mapping deeply un-structured Javascript objects effortlessly scaling globally.</p></div></div><div class='tech-row'><div style='flex-shrink:0;'><img src='https://upload.wikimedia.org/wikipedia/commons/d/d5/Tailwind_CSS_Logo.svg' width='40' class='tech-logo'></div><div><strong>Tailwind CSS</strong><p>Utility-first stylistic matrix streamlining aesthetic component developments consistently avoiding bulky cascading stylesheets elegantly.</p></div></div><h3>11.2.1 Auxiliary Execution Layer</h3><p>Navigation fluidity is secured by client-side routing logic which effectively intercepts browser URL resolutions and maps them identically to appropriate javascript payloads drastically reducing redundant server requests.</p><p>The Express.js routing middleware encapsulates business logic entirely, structurally segregating authorization filters, payload sanitization procedures, and database writes cleanly executing MVC conventions beautifully.</p></div>
-<div class='page-section'><div class='page-header'><span class='inst'>SDJ INTERNATIONAL COLLEGE</span><span>MODULES DESCRIPTION</span></div><div class='page-footer'><span>Page </span></div><h2 id='sec-12'>12. MODULES DESCRIPTION</h2><h3>12.1 Algorithmic Data Adjustments</h3><p>The Sliq system is segmented into discrete operational modules each exposing a series of representational state transfer (REST) endpoints summarized below executing high availability benchmarks efficiently.</p><h3>12.1 Authentication & Profile API</h3><div class='table-container'><table><tr><th>Endpoint</th><th>Method</th><th>Auth Required</th></tr><tr><td>/api/auth/register</td><td>POST</td><td>No</td></tr><tr><td>/api/auth/login</td><td>POST</td><td>No</td></tr><tr><td>/api/user/profile</td><td>GET</td><td>Yes (JWT)</td></tr></table></div><p>Environment parity is forcefully preserved traversing across local development servers executing parallel to hardened production environments utilizing Dockerized image configurations securely maintaining behavioral constants.</p></div>
+<div class='page-section'><div class='page-header'><span class='inst'>C. B. PATEL COMPUTER COLLEGE</span><span>MODULES DESCRIPTION</span></div><div class='page-footer'><span>Page </span></div><h2 id='sec-12'>12. MODULES DESCRIPTION</h2><h3>12.1 Algorithmic Data Adjustments</h3><p>The Sliq system is segmented into discrete operational modules each exposing a series of representational state transfer (REST) endpoints summarized below executing high availability benchmarks efficiently.</p><h3>12.1 Authentication & Profile API</h3><div class='table-container'><table><tr><th>Endpoint</th><th>Method</th><th>Auth Required</th></tr><tr><td>/api/auth/register</td><td>POST</td><td>No</td></tr><tr><td>/api/auth/login</td><td>POST</td><td>No</td></tr><tr><td>/api/user/profile</td><td>GET</td><td>Yes (JWT)</td></tr></table></div><p>Environment parity is forcefully preserved traversing across local development servers executing parallel to hardened production environments utilizing Dockerized image configurations securely maintaining behavioral constants.</p></div>
 <div class='page-section'><div class='page-header'>MODULES DESCRIPTION</div><div class='page-footer'><span>Page </span></div><h3>12.2 Functional Analysis Specifications</h3><p>The Sliq system is segmented into discrete operational modules each exposing a series of representational state transfer (REST) endpoints summarized below executing high availability benchmarks efficiently.</p><h3>12.2 Workspace & Task Orchestration API</h3><div class='table-container'><table><tr><th>Endpoint</th><th>Method</th><th>Action</th></tr><tr><td>/api/workspaces</td><td>GET</td><td>Fetch active clusters</td></tr><tr><td>/api/tasks/move</td><td>PUT</td><td>Update Kanban state</td></tr><tr><td>/api/tasks/:id</td><td>DELETE</td><td>Purge Task record</td></tr></table></div><p>The Express.js routing middleware encapsulates business logic entirely, structurally segregating authorization filters, payload sanitization procedures, and database writes cleanly executing MVC conventions beautifully.</p></div>
-<div class='page-section'><div class='page-header'><span class='inst'>SDJ INTERNATIONAL COLLEGE</span><span>FEATURES</span></div><div class='page-footer'><span>Page </span></div><h2 id='sec-13'>13. FEATURES</h2><h3>13.1 Functional Analysis Specifications</h3><div style='text-align:center; margin-bottom: 25px; page-break-inside: avoid;'><img src='./screenshots/network_topology.png' width='480' style='height: auto; max-width: 90%; max-height: 70mm; object-fit: contain; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); border: 1px solid #ddd;' alt='visual'/></div><p class='figure-caption'><b>Figure 9.12: Network Topology</b></p><p>The Express.js routing middleware encapsulates business logic entirely, structurally segregating authorization filters, payload sanitization procedures, and database writes cleanly executing MVC conventions beautifully.</p><p>By leveraging Mongoose ORM models, the backend constructs heavily validated documents before transmitting payload updates into the underlying MongoDB cluster. This preserves absolute data integrity avoiding malicious schema poisoning strictly.</p><ul><li>Executing dynamic state isolation effectively avoiding synchronization drifts naturally.</li><li>Encrypting core socket transmission streams efficiently safely.</li><li>Minimizing DOM mutation loops automatically reliably efficiently accurately appropriately.</li></ul><p>The incorporation of Socket.io event-emitting nodes essentially builds a multiplexed duplex pipeline linking clients actively to corresponding room identifiers explicitly filtering noisy broadcast messages efficiently.</p></div>
+<div class='page-section'><div class='page-header'><span class='inst'>C. B. PATEL COMPUTER COLLEGE</span><span>FEATURES</span></div><div class='page-footer'><span>Page </span></div><h2 id='sec-13'>13. FEATURES</h2><h3>13.1 Functional Analysis Specifications</h3><div style='text-align:center; margin-bottom: 25px; page-break-inside: avoid;'><img src='./screenshots/network_topology.png' width='480' style='height: auto; max-width: 90%; max-height: 70mm; object-fit: contain; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); border: 1px solid #ddd;' alt='visual'/></div><p class='figure-caption'><b>Figure 9.12: Network Topology</b></p><p>The Express.js routing middleware encapsulates business logic entirely, structurally segregating authorization filters, payload sanitization procedures, and database writes cleanly executing MVC conventions beautifully.</p><p>By leveraging Mongoose ORM models, the backend constructs heavily validated documents before transmitting payload updates into the underlying MongoDB cluster. This preserves absolute data integrity avoiding malicious schema poisoning strictly.</p><ul><li>Executing dynamic state isolation effectively avoiding synchronization drifts naturally.</li><li>Encrypting core socket transmission streams efficiently safely.</li><li>Minimizing DOM mutation loops automatically reliably efficiently accurately appropriately.</li></ul><p>The incorporation of Socket.io event-emitting nodes essentially builds a multiplexed duplex pipeline linking clients actively to corresponding room identifiers explicitly filtering noisy broadcast messages efficiently.</p></div>
 <div class='page-section'><div class='page-header'>FEATURES</div><div class='page-footer'><span>Page </span></div><h3>13.2 Operational Integration Techniques</h3><div style='text-align:center; margin-bottom: 25px; page-break-inside: avoid;'><img src='./screenshots/ai_machine_learning.png' width='480' style='height: auto; max-width: 90%; max-height: 70mm; object-fit: contain; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); border: 1px solid #ddd;' alt='visual'/></div><p class='figure-caption'><b>Figure 9.13: AI and Machine Learning Integration</b></p><p>Adopting stateless JSON Web Token (JWT) paradigms inherently allows the application backends to independently manage authorization matrices completely removing central session storage constraints scaling horizontally immensely.</p><p>Database relations represent one-to-many aggregations beautifully across decoupled collections, optimizing query execution pathways while entirely discarding the heavy resource overhead historically demanded by massive relational JOIN clauses.</p><ul><li>Executing dynamic state isolation effectively avoiding synchronization drifts naturally.</li><li>Encrypting core socket transmission streams efficiently safely.</li><li>Minimizing DOM mutation loops automatically reliably efficiently accurately appropriately.</li></ul><p>When a granular task transitions states, the asynchronous API middleware actively initiates an acknowledgement payload communicating instantly to connected web sockets forcing their respective client boards to react accordingly natively.</p></div>
-<div class='page-section'><div class='page-header'><span class='inst'>SDJ INTERNATIONAL COLLEGE</span><span>DATABASE DESIGN</span></div><div class='page-footer'><span>Page </span></div><h2 id='sec-14'>14. DATABASE DESIGN</h2><h3>14.1 Core System Schema (Hierarchy to Execution)</h3>
+<div class='page-section'><div class='page-header'><span class='inst'>C. B. PATEL COMPUTER COLLEGE</span><span>DATABASE DESIGN</span></div><div class='page-footer'><span>Page </span></div><h2 id='sec-14'>14. DATABASE DESIGN</h2><h3>14.1 Core System Schema (Hierarchy to Execution)</h3>
 <p>The SLIQ data model is architected as a hierarchical cascade, moving from organizational roots to granular work units. This unified schema ensures absolute referential integrity across all system modules.</p>
 <div class='mermaid' style='max-width:100%; max-height:140mm;'>
 graph TD
-    classDef root fill:#e3f2fd,stroke:#1565c0,color:#000;
-    classDef node fill:#f1f8e9,stroke:#558b2f,color:#000;
-    classDef exec fill:#fff8e1,stroke:#f9a825,color:#000;
+    classDef root fill:#e3f2fd,stroke:#1565c0,stroke-width:3px,color:#000;
+    classDef node fill:#f1f8e9,stroke:#558b2f,stroke-width:3px,color:#000;
+    classDef exec fill:#fff8e1,stroke:#f9a825,stroke-width:3px,color:#000;
 
     User["USER - Root | _id: ObjectId PK | email: String"]:::root
     Workspace["WORKSPACE | _id: ObjectId PK | owner: FK User"]:::node
@@ -430,7 +538,7 @@ graph TD
 <p>The final layer manages auxiliary services and maintains global system integrity through strict relational logic. The following diagram shows how notifications, audit logs, and meetings interconnect with the core workspace model.</p>
 <div class='mermaid' style='max-width:100%; max-height:130mm;'>
 graph TD
-    classDef event fill:#f3e5f5,stroke:#7b1fa2,color:#000;
+    classDef event fill:#f3e5f5,stroke:#7b1fa2,stroke-width:3px,color:#000;
     Meeting["MEETING | roomId: String | organizer: FK"]:::event
     Notification["NOTIFICATION | type: enum | isRead: Bool"]:::event
     Activity["ACTIVITY Audit | action: String"]:::event
@@ -448,7 +556,7 @@ graph TD
 </div>
 </div>
 
-<div class='page-section'><div class='page-header'><span class='inst'>SDJ INTERNATIONAL COLLEGE</span><span>IMPLEMENTATION DETAILS</span></div><div class='page-footer'><span>Page </span></div><h2 id='sec-15'>15. IMPLEMENTATION DETAILS</h2><h3>15.1 Security Hardening Metrics</h3><div style='text-align:center; margin-bottom: 25px; page-break-inside: avoid;'><img src='./screenshots/blockchain_nodes.png' width='480' style='height: auto; max-width: 90%; max-height: 70mm; object-fit: contain; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); border: 1px solid #ddd;' alt='visual'/></div><p class='figure-caption'><b>Figure 9.14: Blockchain Nodes</b></p><p>Controller algorithms aggressively execute atomic transactions assuring that parallel modifications to specific arrays maintain strictly synchronized behaviors gracefully resolving race condition anomalies silently.</p><p>Cryptographic data handling includes injecting pre-save middleware hooks explicitly salting and hashing distinct credentials ensuring compliance with major security conventions seamlessly maintaining user data confidentiality natively.</p><ul><li>Executing dynamic state isolation effectively avoiding synchronization drifts naturally.</li><li>Encrypting core socket transmission streams efficiently safely.</li><li>Minimizing DOM mutation loops automatically reliably efficiently accurately appropriately.</li></ul><p>State inconsistency between remote collaborators is absolutely mitigated by this constant communication vector, functionally translating a standard HTTP system into a remarkably synchronized collaborative ecosystem dependably.</p></div>
+<div class='page-section'><div class='page-header'><span class='inst'>C. B. PATEL COMPUTER COLLEGE</span><span>IMPLEMENTATION DETAILS</span></div><div class='page-footer'><span>Page </span></div><h2 id='sec-15'>15. IMPLEMENTATION DETAILS</h2><h3>15.1 Security Hardening Metrics</h3><div style='text-align:center; margin-bottom: 25px; page-break-inside: avoid;'><img src='./screenshots/blockchain_nodes.png' width='480' style='height: auto; max-width: 90%; max-height: 70mm; object-fit: contain; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); border: 1px solid #ddd;' alt='visual'/></div><p class='figure-caption'><b>Figure 9.14: Blockchain Nodes</b></p><p>Controller algorithms aggressively execute atomic transactions assuring that parallel modifications to specific arrays maintain strictly synchronized behaviors gracefully resolving race condition anomalies silently.</p><p>Cryptographic data handling includes injecting pre-save middleware hooks explicitly salting and hashing distinct credentials ensuring compliance with major security conventions seamlessly maintaining user data confidentiality natively.</p><ul><li>Executing dynamic state isolation effectively avoiding synchronization drifts naturally.</li><li>Encrypting core socket transmission streams efficiently safely.</li><li>Minimizing DOM mutation loops automatically reliably efficiently accurately appropriately.</li></ul><p>State inconsistency between remote collaborators is absolutely mitigated by this constant communication vector, functionally translating a standard HTTP system into a remarkably synchronized collaborative ecosystem dependably.</p></div>
 <div class='page-section'><div class='page-header'>IMPLEMENTATION DETAILS</div><div class='page-footer'><span>Page </span></div><h3>15.2 Concurrency & Scalability Benchmarks</h3><div style='text-align:center; margin-bottom: 25px; page-break-inside: avoid;'><img src='./screenshots/docker_containers.png' width='480' style='height: auto; max-width: 90%; max-height: 70mm; object-fit: contain; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); border: 1px solid #ddd;' alt='visual'/></div><p class='figure-caption'><b>Figure 9.15: Docker Containers</b></p><p>Environment parity is forcefully preserved traversing across local development servers executing parallel to hardened production environments utilizing Dockerized image configurations securely maintaining behavioral constants.</p><p>Historical event logs are persistently recorded onto the database layer ensuring an immutable timeline constructed for detailed auditing activities, effectively tracking asynchronous changes to complex nested attributes sequentially.</p><ul><li>Executing dynamic state isolation effectively avoiding synchronization drifts naturally.</li><li>Encrypting core socket transmission streams efficiently safely.</li><li>Minimizing DOM mutation loops automatically reliably efficiently accurately appropriately.</li></ul><p>Bandwidth optimizations inherently implemented via chunked event streams ensure that payload overheads remain negligible despite extreme concurrent user throughput scaling linearly towards maximal theoretical tolerances securely.</p></div>
 <div class='page-section'><div class='page-footer'><span>Page </span></div><h2 id='sec-16'>16. SCREENSHOTS</h2><h3>16.1 Secure Authentication Interface (Login & Signup)</h3>
 <p>The onboarding gateway utilizes a dual-interface approach for secure entry. Below are the primary authentication matrices designed for zero-barrier entry.</p>
@@ -504,16 +612,16 @@ graph TD
     </ul>
 </div>
 </div>
-<div class='page-section'><div class='page-header'><span class='inst'>SDJ INTERNATIONAL COLLEGE</span><span>TESTING AND RESULTS</span></div><div class='page-footer'><span>Page </span></div><h2 id='sec-17'>17. TESTING AND RESULTS</h2><h3>17.1 Component Data Flow Schemas</h3><p>Prior to production deployment, the Sliq platform underwent rigorous functional verification using automated jasmine-centric unit testing matrices ensuring 100% endpoint reliability.</p><h3>17.1 Functional Verification Matrix</h3><div class='table-container'><table><tr><th>Test ID</th><th>Unit / Module</th><th>Expectation</th><th>Result</th></tr><tr><td>TC-001</td><td>JWT Auth Filter</td><td>Block invalid tokens</td><td>PASS</td></tr><tr><td>TC-002</td><td>Socket Broadcast</td><td>Latency < 150ms</td><td>PASS</td></tr><tr><td>TC-003</td><td>DB Atomic Op</td><td>No partial writes</td><td>PASS</td></tr></table></div><p>The incorporation of Socket.io event-emitting nodes essentially builds a multiplexed duplex pipeline linking clients actively to corresponding room identifiers explicitly filtering noisy broadcast messages efficiently.</p></div>
+<div class='page-section'><div class='page-header'><span class='inst'>C. B. PATEL COMPUTER COLLEGE</span><span>TESTING AND RESULTS</span></div><div class='page-footer'><span>Page </span></div><h2 id='sec-17'>17. TESTING AND RESULTS</h2><h3>17.1 Component Data Flow Schemas</h3><p>Prior to production deployment, the Sliq platform underwent rigorous functional verification using automated jasmine-centric unit testing matrices ensuring 100% endpoint reliability.</p><h3>17.1 Functional Verification Matrix</h3><div class='table-container'><table><tr><th>Test ID</th><th>Unit / Module</th><th>Expectation</th><th>Result</th></tr><tr><td>TC-001</td><td>JWT Auth Filter</td><td>Block invalid tokens</td><td>PASS</td></tr><tr><td>TC-002</td><td>Socket Broadcast</td><td>Latency < 150ms</td><td>PASS</td></tr><tr><td>TC-003</td><td>DB Atomic Op</td><td>No partial writes</td><td>PASS</td></tr></table></div><p>The incorporation of Socket.io event-emitting nodes essentially builds a multiplexed duplex pipeline linking clients actively to corresponding room identifiers explicitly filtering noisy broadcast messages efficiently.</p></div>
 <div class='page-section'><div class='page-header'>TESTING AND RESULTS</div><div class='page-footer'><span>Page </span></div><h3>17.2 Algorithmic Data Adjustments</h3><p>Prior to production deployment, the Sliq platform underwent rigorous functional verification using automated jasmine-centric unit testing matrices ensuring 100% endpoint reliability.</p><h3>17.2 System Benchmarks & Performance</h3><div class='table-container'><table><tr><th>Metric</th><th>Target</th><th>Achieved</th></tr><tr><td>Page Load Time</td><td>< 2.0s</td><td>1.1s</td></tr><tr><td>Concurrent Users</td><td>500+</td><td>740 (Stable)</td></tr><tr><td>DB Query Time</td><td>< 50ms</td><td>12ms</td></tr></table></div><p>When a granular task transitions states, the asynchronous API middleware actively initiates an acknowledgement payload communicating instantly to connected web sockets forcing their respective client boards to react accordingly natively.</p></div>
-<div class='page-section'><div class='page-header'><span class='inst'>SDJ INTERNATIONAL COLLEGE</span><span>ADVANTAGES</span></div><div class='page-footer'><span>Page </span></div><h2 id='sec-18'>18. ADVANTAGES</h2><h3>18.1 Algorithmic Data Adjustments</h3><div style='text-align:center; margin-bottom: 25px; page-break-inside: avoid;'><img src='./screenshots/api_gateway.png' width='480' style='height: auto; max-width: 90%; max-height: 70mm; object-fit: contain; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); border: 1px solid #ddd;' alt='visual'/></div><p>Adopting stateless JSON Web Token (JWT) paradigms inherently allows the application backends to independently manage authorization matrices completely removing central session storage constraints scaling horizontally immensely.</p><p>Database relations represent one-to-many aggregations beautifully across decoupled collections, optimizing query execution pathways while entirely discarding the heavy resource overhead historically demanded by massive relational JOIN clauses.</p><ul><li>Executing dynamic state isolation effectively avoiding synchronization drifts naturally.</li><li>Encrypting core socket transmission streams efficiently safely.</li><li>Minimizing DOM mutation loops automatically reliably efficiently accurately appropriately.</li></ul><p>When a granular task transitions states, the asynchronous API middleware actively initiates an acknowledgement payload communicating instantly to connected web sockets forcing their respective client boards to react accordingly natively.</p></div>
-<div class='page-section'><div class='page-header'><span class='inst'>SDJ INTERNATIONAL COLLEGE</span><span>LIMITATIONS</span></div><div class='page-footer'><span>Page </span></div><h2 id='sec-19'>19. LIMITATIONS</h2><h3>19.1 Functional Analysis Specifications</h3><div style='text-align:center; margin-bottom: 25px; page-break-inside: avoid;'><img src='./screenshots/responsive_design.png' width='480' style='height: auto; max-width: 90%; max-height: 70mm; object-fit: contain; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); border: 1px solid #ddd;' alt='visual'/></div><p>Controller algorithms aggressively execute atomic transactions assuring that parallel modifications to specific arrays maintain strictly synchronized behaviors gracefully resolving race condition anomalies silently.</p><p>Cryptographic data handling includes injecting pre-save middleware hooks explicitly salting and hashing distinct credentials ensuring compliance with major security conventions seamlessly maintaining user data confidentiality natively.</p><ul><li>Executing dynamic state isolation effectively avoiding synchronization drifts naturally.</li><li>Encrypting core socket transmission streams efficiently safely.</li><li>Minimizing DOM mutation loops automatically reliably efficiently accurately appropriately.</li></ul><p>State inconsistency between remote collaborators is absolutely mitigated by this constant communication vector, functionally translating a standard HTTP system into a remarkably synchronized collaborative ecosystem dependably.</p></div>
-<div class='page-section'><div class='page-header'><span class='inst'>SDJ INTERNATIONAL COLLEGE</span><span>FUTURE ENHANCEMENTS</span></div><div class='page-footer'><span>Page </span></div><h2 id='sec-20'>20. FUTURE ENHANCEMENTS</h2><h3>20.1 Operational Integration Techniques</h3><div style='text-align:center; margin-bottom: 25px;'><div class='mermaid'>pie title Stack Distribution
+<div class='page-section'><div class='page-header'><span class='inst'>C. B. PATEL COMPUTER COLLEGE</span><span>ADVANTAGES</span></div><div class='page-footer'><span>Page </span></div><h2 id='sec-18'>18. ADVANTAGES</h2><h3>18.1 Algorithmic Data Adjustments</h3><div style='text-align:center; margin-bottom: 25px; page-break-inside: avoid;'><img src='./screenshots/api_gateway.png' width='480' style='height: auto; max-width: 90%; max-height: 70mm; object-fit: contain; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); border: 1px solid #ddd;' alt='visual'/></div><p>Adopting stateless JSON Web Token (JWT) paradigms inherently allows the application backends to independently manage authorization matrices completely removing central session storage constraints scaling horizontally immensely.</p><p>Database relations represent one-to-many aggregations beautifully across decoupled collections, optimizing query execution pathways while entirely discarding the heavy resource overhead historically demanded by massive relational JOIN clauses.</p><ul><li>Executing dynamic state isolation effectively avoiding synchronization drifts naturally.</li><li>Encrypting core socket transmission streams efficiently safely.</li><li>Minimizing DOM mutation loops automatically reliably efficiently accurately appropriately.</li></ul><p>When a granular task transitions states, the asynchronous API middleware actively initiates an acknowledgement payload communicating instantly to connected web sockets forcing their respective client boards to react accordingly natively.</p></div>
+<div class='page-section'><div class='page-header'><span class='inst'>C. B. PATEL COMPUTER COLLEGE</span><span>LIMITATIONS</span></div><div class='page-footer'><span>Page </span></div><h2 id='sec-19'>19. LIMITATIONS</h2><h3>19.1 Functional Analysis Specifications</h3><div style='text-align:center; margin-bottom: 25px; page-break-inside: avoid;'><img src='./screenshots/responsive_design.png' width='480' style='height: auto; max-width: 90%; max-height: 70mm; object-fit: contain; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); border: 1px solid #ddd;' alt='visual'/></div><p>Controller algorithms aggressively execute atomic transactions assuring that parallel modifications to specific arrays maintain strictly synchronized behaviors gracefully resolving race condition anomalies silently.</p><p>Cryptographic data handling includes injecting pre-save middleware hooks explicitly salting and hashing distinct credentials ensuring compliance with major security conventions seamlessly maintaining user data confidentiality natively.</p><ul><li>Executing dynamic state isolation effectively avoiding synchronization drifts naturally.</li><li>Encrypting core socket transmission streams efficiently safely.</li><li>Minimizing DOM mutation loops automatically reliably efficiently accurately appropriately.</li></ul><p>State inconsistency between remote collaborators is absolutely mitigated by this constant communication vector, functionally translating a standard HTTP system into a remarkably synchronized collaborative ecosystem dependably.</p></div>
+<div class='page-section'><div class='page-header'><span class='inst'>C. B. PATEL COMPUTER COLLEGE</span><span>FUTURE ENHANCEMENTS</span></div><div class='page-footer'><span>Page </span></div><h2 id='sec-20'>20. FUTURE ENHANCEMENTS</h2><h3>20.1 Operational Integration Techniques</h3><div style='text-align:center; margin-bottom: 25px;'><div class='mermaid'>pie title Stack Distribution
  "React" : 40
  "Node" : 25
  "DB" : 20
  "Express" : 15</div></div><p>Environment parity is forcefully preserved traversing across local development servers executing parallel to hardened production environments utilizing Dockerized image configurations securely maintaining behavioral constants.</p><p>Historical event logs are persistently recorded onto the database layer ensuring an immutable timeline constructed for detailed auditing activities, effectively tracking asynchronous changes to complex nested attributes sequentially.</p><ul><li>Executing dynamic state isolation effectively avoiding synchronization drifts naturally.</li><li>Encrypting core socket transmission streams efficiently safely.</li><li>Minimizing DOM mutation loops automatically reliably efficiently accurately appropriately.</li></ul><p>Bandwidth optimizations inherently implemented via chunked event streams ensure that payload overheads remain negligible despite extreme concurrent user throughput scaling linearly towards maximal theoretical tolerances securely.</p></div>
-<div class='page-section'><div class='page-header'><span class='inst'>SDJ INTERNATIONAL COLLEGE</span><span>CONCLUSION</span></div><div class='page-footer'><span>Page </span></div><h2 id='sec-21'>21. CONCLUSION</h2><h3>21.1 Security Hardening Metrics</h3><div style='text-align:center; margin-bottom: 25px;'><div class='mermaid'>gitGraph
+<div class='page-section'><div class='page-header'><span class='inst'>C. B. PATEL COMPUTER COLLEGE</span><span>CONCLUSION</span></div><div class='page-footer'><span>Page </span></div><h2 id='sec-21'>21. CONCLUSION</h2><h3>21.1 Security Hardening Metrics</h3><div style='text-align:center; margin-bottom: 25px;'><div class='mermaid'>gitGraph
  commit id: "init"
  branch net
  checkout net
@@ -522,6 +630,7 @@ graph TD
  merge net
  commit id: "v1"</div></div><p>The Express.js routing middleware encapsulates business logic entirely, structurally segregating authorization filters, payload sanitization procedures, and database writes cleanly executing MVC conventions beautifully.</p><p>By leveraging Mongoose ORM models, the backend constructs heavily validated documents before transmitting payload updates into the underlying MongoDB cluster. This preserves absolute data integrity avoiding malicious schema poisoning strictly.</p><ul><li>Executing dynamic state isolation effectively avoiding synchronization drifts naturally.</li><li>Encrypting core socket transmission streams efficiently safely.</li><li>Minimizing DOM mutation loops automatically reliably efficiently accurately appropriately.</li></ul><p>The incorporation of Socket.io event-emitting nodes essentially builds a multiplexed duplex pipeline linking clients actively to corresponding room identifiers explicitly filtering noisy broadcast messages efficiently.</p></div>
 <div class='page-section'><div class='page-footer'><span>Page </span></div><h2 id='sec-22'>22. REFERENCES</h2><ol><li>Crockford, D. (2008). <em>JavaScript: The Good Parts</em>. O'Reilly.</li><li>Cantelon, M. et al. (2014). <em>Node.js in Action</em>. Manning Publications.</li><li>Banker, K. et al. (2016). <em>MongoDB in Action</em>. Manning.</li><li>Atlassian Ecosystem Research. (2025). <em>Agile methodologies spanning digital transition</em>.</li></ol><br><br><p>The aforementioned literary resources formed the substantial structural baseline evaluating the theoretical paradigms instantiated completely within this documentation matrix seamlessly. Furthermore, official MDN javascript web documentation synthetically resolved localized runtime execution anomalies accurately efficiently comprehensively correctly explicitly fundamentally universally successfully dependably intelligently consistently functionally seamlessly.</p></div>
-  </div>
+</div>
+</div>
 </body>
 </html>
