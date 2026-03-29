@@ -3,6 +3,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const http = require('http');
+const path = require('path');
 require('dotenv').config();
 
 const connectDB = require('./config/db');
@@ -25,6 +26,10 @@ app.use(helmet());
 app.use(cors());
 app.use(express.json());
 
+// Serve Static Documentation for PDF Generator (Puppeteer)
+// This maps /docs to the docs folder outside of the server directory
+app.use('/docs', express.static(path.join(__dirname, '../docs')));
+
 // Rate Limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -43,6 +48,7 @@ app.use('/api/analytics', require('./routes/analyticsRoutes'));
 app.use('/api/notifications', require('./routes/notificationRoutes'));
 app.use('/api/activity', require('./routes/activityRoutes'));
 app.use('/api/meetings', require('./routes/meetingRoutes'));
+app.use('/', require('./routes/pdfRoutes'));
 
 app.get('/', (req, res) => {
   res.send('Project Management API is running...');

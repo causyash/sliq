@@ -1,127 +1,1125 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
+<!DOCTYPE html><html lang="en"><head>
     <meta charset="UTF-8">
-    <title>SLiq - 75 Page Premium Documentation</title>
-    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sliq Project Documentation - Academic Dissertation</title>
+    <!-- Mermaid for Flowcharts -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@9.4.3/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            themeVariables: {
+                fontSize: '26px',
+                primaryColor: '#ffcece',
+                secondaryColor: '#ceeeff',
+                tertiaryColor: '#e2ffce',
+                primaryBorderColor: '#d30000',
+                lineColor: '#0055ff',
+                fontFamily: '"Times New Roman", serif'
+            }
+        });
+    </script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&family=Times+New+Roman&display=swap');
+        /* A4 Page Setup */
+        @media print {
+            body {
+                font-family: "Times New Roman", serif; /* Academic Standard */
+                line-height: 1.6;
+                background: none !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            
+            @page {
+                size: A4;
+                margin: 0; /* Zero margin to avoid double spaces with .page padding */
+            }
+
+            .page {
+                margin: 0 !important;
+                padding: 25mm 20mm 27mm 20mm !important;
+                box-shadow: none !important;
+                page-break-after: always;
+                page-break-inside: avoid !important;
+                border: none !important;
+                width: 210mm !important;
+                height: 297mm !important; /* STRICT constraint */
+                max-height: 297mm !important;
+                overflow: hidden !important; /* Do not allow page bleeding */
+            }
+            
+            .page:last-of-type {
+                page-break-after: auto;
+            }
+
+            h1, h2, h3 { 
+                page-break-after: avoid; 
+                color: #003366 !important;
+            }
+
+            p, table, img, .diagram-container { 
+                page-break-inside: avoid; 
+            }
+
+            /* Force new pages for chapters */
+            .chapter-start { 
+                page-break-before: always; 
+            }
+            
+            .no-print { display: none !important; }
+
+            /* Retained for diagram safety */
+            .mermaid svg, .flowchart svg {
+                max-width: 100% !important;
+                height: auto !important;
+                transform-origin: top left;
+            }
+        }
+
+        :root {
+            --page-width: 210mm;
+            --page-height: 297mm;
+            --font-main: "Times New Roman", Times, serif;
+            --academic-blue: #003366;
+            --border-color: #000000;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: #f0f2f5;
+            color: #000;
+            line-height: 1.5;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        /* Professional Page Container */
+        .page {
+            width: var(--page-width);
+            height: var(--page-height); /* Strict academic paginated mode */
+            max-height: var(--page-height); 
+            padding: 25mm 20mm 27mm 20mm; /* Precisely 2 lines above page number (15mm + 12mm) */
+            margin: 20px auto;
+            background: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            position: relative;
+            page-break-after: always;
+            overflow: hidden; /* Avoid cut content and clear container bounds */
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Requirement: A4 Borders (Double Line Academic Style) */
+        .page-border {
+            position: absolute;
+            top: 10mm;
+            left: 10mm;
+            width: calc(100% - 20mm);
+            height: calc(297mm - 20mm); /* Absolute lock to prevent stretch overflow */
+            border: 3px double var(--border-color);
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        /* Typography */
+        h1, h2, h3, h4 {
+            font-family: var(--font-main);
+            color: var(--academic-blue);
+            font-weight: bold;
+            text-align: left;
+            margin-bottom: 15pt;
+        }
+
+        h1 { font-size: 24pt; text-align: center; text-transform: uppercase; margin-top: 20pt; }
+        h2 { font-size: 18pt; border-bottom: 2pt solid var(--academic-blue); padding-bottom: 5pt; margin-top: 30pt; }
+        h3 { font-size: 14pt; margin-top: 20pt; border-left: 4pt solid var(--academic-blue); padding-left: 10pt; }
         
-        :root { --primary: #1e3a8a; --secondary: #ea580c; --accent: #2563eb; --border: #000; }
-        @page { size: A4; margin: 0; }
-        * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        p { 
+            font-size: 12pt; 
+            text-align: justify; 
+            margin-bottom: 12pt; 
+            text-indent: 0.5in; /* Academic paragraph indent */
+        }
+
+        ul, ol {
+            margin-left: 0.5in;
+            margin-bottom: 12pt;
+            font-size: 12pt;
+        }
+
+        li { 
+            margin-bottom: 8pt; 
+            text-align: justify;
+            padding-left: 5pt;
+        }
+
+        /* Requirement: Table Fixes */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20pt 0;
+            table-layout: fixed; /* Fixed layout requirement */
+            word-wrap: break-word; /* Word wrap requirement */
+            font-size: 11pt;
+            border: 1.5pt solid black;
+            page-break-inside: avoid; /* Prevent breaking across pages */
+        }
+
+        th, td {
+            border: 0.5pt solid black;
+            padding: 8pt;
+            text-align: left;
+            vertical-align: top;
+            overflow-wrap: break-word; /* Ensure text wraps */
+        }
+
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        /* Requirement: Flowchart Fixes */
+        .diagram-container {
+            width: 100%;
+            max-width: 100%; 
+            margin: 10pt 0 5pt 0; /* Reduced to bind tightly to caption */
+            padding: 5pt;
+            background: #fff;
+            border: 1pt solid #ddd;
+            display: flex;
+            justify-content: center;
+            page-break-inside: avoid !important;
+            page-break-after: avoid !important;
+            break-after: avoid !important;
+            overflow: hidden; /* Clamp diagram within its container */
+        }
+
+        .mermaid {
+            width: 100% !important;
+            display: flex;
+            justify-content: center;
+        }
+
+        .mermaid svg {
+            max-width: 100% !important;
+            height: auto !important;
+            max-height: 70mm !important; /* Reduced to avoid border overflow on multi-diagram pages */
+        }
+
+        /* Screenshots */
+        .screenshot {
+            width: 100%;
+            max-height: 75mm;
+            object-fit: contain;
+            border: none;
+            margin: 15pt 0;
+        }
+
+        /* Headers & Footers */
+        .page-header-text {
+            font-size: 9pt;
+            text-align: center;
+            color: #666;
+            margin-bottom: 10mm;
+            font-style: italic;
+        }
+
+        .page-footer-container {
+            position: absolute;
+            bottom: 15mm;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 11pt;
+            font-weight: bold;
+            color: var(--academic-blue);
+        }
+
+        /* Cover Page Styling */
+        .cover-page {
+            text-align: center;
+            justify-content: center;
+            align-items: center;
+            padding: 40mm 20mm;
+        }
+
+        .college-title { font-size: 26pt; font-weight: 900; color: var(--academic-blue); }
+        .dept-title { font-size: 18pt; margin: 10mm 0; }
+        .project-banner {
+            font-size: 32pt;
+            font-weight: 800;
+            margin: 20mm 0;
+            padding: 10mm;
+            border-top: 5pt solid #000;
+            border-bottom: 5pt solid #000;
+        }
+
+        /* Index Styles */
+        .index-item {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1pt dotted #aaa;
+            margin-bottom: 5pt;
+            font-size: 11pt;
+            line-height: 1.2;
+        }
+
+        .chapter-jump {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .chapter-label { font-size: 28pt; color: #777; }
+        .chapter-main-title { font-size: 48pt; font-weight: bold; color: var(--academic-blue); text-transform: uppercase; }
+
+        /* Utility Classes */
+        .no-print { display: none; }
+        .fill-page { flex-grow: 1; }
+        .content-body {
+            flex-grow: 1;
+            padding-top: 10pt;
+            max-height: 245mm; /* Clamp content to end exactly 2 lines above page number */
+            overflow: hidden; 
+        }
+        .page-header {
+            font-size: 10pt;
+            text-align: right;
+            border-bottom: 1pt solid var(--academic-blue);
+            padding-bottom: 3pt;
+            margin-bottom: 15pt;
+            color: var(--academic-blue);
+            font-weight: bold;
+        }
+
+        /* Improved Table Responsiveness for Print */
+        .table-container {
+            width: 100%;
+            overflow-x: hidden;
+        }
+
+        /* Sub-heading refinement */
+        h3 { 
+            font-size: 14pt; 
+            margin-top: 25pt; 
+            color: #000;
+            border-left: 5pt solid var(--academic-blue); 
+            padding-left: 10pt;
+            margin-bottom: 15pt;
+        }
+
+        /* Paragraph Indent Fix */
+        p.no-indent { text-indent: 0 !important; }
         
-        body { font-family: 'Times New Roman', Times, serif; font-size: 13pt; line-height: 1.8; margin: 0; background-color: #525659; color: #1a1a1a; display: flex; flex-direction: column; align-items: center; padding: 20px 0; }
-        
-        #action-bar { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; gap: 10px; background: white; padding: 10px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        .btn { padding: 15px 30px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 11pt; }
-        .btn-pdf { background: var(--primary); color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
-        
-        #document-container { width: 100%; display: flex; flex-direction: column; align-items: center; }
-        
-        .page { width: 210mm; height: 297mm; padding: 20mm 20mm 30mm 20mm; position: relative; background: white; page-break-after: always; display: flex; flex-direction: column; overflow: hidden; margin-bottom: 20px; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
-        .page-border { position: absolute; top: 10mm; left: 10mm; right: 10mm; bottom: 12mm; border: double 6px #000; pointer-events: none; z-index: 100; }
-        
-        .header { display: flex; align-items: center; border-bottom: 2px solid var(--primary); padding-bottom: 15px; margin-bottom: 30px; }
-        .header-logo { width: 60px; height: 60px; background: var(--primary); color: white; font-weight: bold; display: flex; align-items: center; justify-content: center; margin-right: 20px; border-radius: 4px; font-size: 16px; font-family: 'Segoe UI', Arial, sans-serif; }
-        .header-text { color: var(--primary); font-size: 20px; font-weight: 700; text-transform: uppercase; font-family: 'Segoe UI', Arial, sans-serif;}
-        
-        .footer-page-num { position: absolute; bottom: 6mm; left: 0; right: 0; text-align: center; color: var(--primary); font-weight: bold; font-size: 14px; z-index: 101; font-family: 'Segoe UI', Arial, sans-serif;}
-        
-        .chapter-start { display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%; text-align: center; }
-        .chapter-start h1 { font-size: 3rem; text-transform: uppercase; border: none; margin: 0; color: var(--primary); margin-bottom: 20px;}
-        
-        h1, h2, h3 { color: var(--primary); margin-top: 25px; margin-bottom: 20px; }
-        h2 { font-size: 20pt; border-bottom: 2.5px solid var(--primary); padding-bottom: 10px; text-transform: uppercase; }
-        h3 { font-size: 16pt; color: var(--secondary); }
-        p { margin-bottom: 20px; text-indent: 10mm; text-align: justify; }
-        ul { margin-bottom: 20px; padding-left: 40px; }
-        li { margin-bottom: 15px; }
-        
-        .toc-table, .data-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 12pt; border: 2px solid #000; }
-        .toc-table th, .data-table th { background: #f2f2f2; border: 1px solid #000; padding: 12px; color: #000; font-weight: bold; }
-        .toc-table td, .data-table td { border: 1px solid #000; padding: 10px; }
-        .index-chapter { background: #E1F5FE; font-weight: bold; }
-        
-        .diagram-box { margin: 20px 0; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; max-width: 95%; background: #fdfdfd; border: 2px solid #eee; padding: 20px; box-sizing: border-box;}
-        .mermaid { transform: scale(1.1); transform-origin: center top; margin: auto; }
-        .figure-caption { text-align: center; font-size: 11pt; font-style: italic; font-weight: bold; margin-top: 15px; }
-        
-        .image-box { width: 100%; margin-top: 20px; text-align: center; }
-        .image-box img { width: 95%; max-height: 180mm; border: 2px solid #333; box-shadow: 2px 2px 8px rgba(0,0,0,0.2); object-fit: contain; }
-        
-        .center { text-align: center; }
-        
-        @media print { 
-            body { background: none; padding: 0; margin: 0; } 
-            #action-bar { display: none !important; } 
-            #document-container { margin: 0; box-shadow: none; } 
-            .page { margin: 0 !important; box-shadow: none !important; border: none !important; } 
-            .page-border { border: double 6px #000 !important; }
+        /* Figure Caption */
+        .figure-caption {
+            text-align: center;
+            font-size: 11pt;
+            color: #555;
+            font-style: italic;
+            margin-top: 5pt;
+            margin-bottom: 8pt;
+            page-break-before: avoid !important;
+            break-before: avoid !important;
+        }
+
+        /* Floating Download Button */
+        .download-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--academic-blue);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 50px;
+            font-size: 14pt;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            z-index: 1000;
+            transition: transform 0.2s, background 0.2s;
+        }
+
+        .download-btn:hover {
+            background: #004488;
+            transform: translateY(-3px);
+        }
+
+        .download-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Flowchart Class for scaling */
+        .flowchart, svg, img {
+            max-width: 100%;
+            height: auto;
+            page-break-inside: avoid;
         }
     </style>
 </head>
 <body>
-    <div id="action-bar"><button class="btn btn-pdf" onclick="window.print()">Download Project Documentation (75 Pages PDF)</button></div>
-    <div id="document-container">
-<div class="page"><div class="page-border"></div>
-    <div class="center" style="margin-top: 30px;">
-        <div style="font-size: 1.4rem; font-weight: bold; margin-bottom: 0.3rem;">C. B. PATEL COMPUTER COLLEGE</div>
-        <div style="font-size: 0.9rem; margin-bottom: 1.5rem;">Affiliated to Veer Narmad South Gujarat University, Surat</div>
-        
-        <div style="width: 130px; height: 130px; margin: 0 auto 2.5rem auto; border-radius: 50%; background: var(--primary); display: flex; align-items: center; justify-content: center; color: white; border: 4px double white; box-shadow: 0 0 10px rgba(0,0,0,0.5); font-size: 38px; font-weight: 800;">CBP</div>
-        
-        <div style="font-size: 1.4rem; font-weight: bold; margin-bottom: 2rem; color: var(--primary);">BACHELOR OF COMPUTER APPLICATIONS (B.C.A.)</div>
-        
-        <div style="font-size: 1.1rem; margin-bottom: 0.5rem; letter-spacing: 2px;">A PROJECT REPORT ON</div>
-        <div style="font-size: 2rem; font-weight: 800; color: var(--primary); margin-bottom: 1.5rem; text-transform: uppercase;">SLiq: Real-Time Project Management Ecosystem</div>
 
-        <div style="font-size: 1.1rem; margin-bottom: 0.5rem;">SUBMITTED IN PARTIAL FULFILLMENT OF REQUREMENTS FOR</div>
-        <div style="font-size: 1.25rem; font-weight: bold; margin-bottom: 1.5rem;">B.C.A. SEMESTER - VI</div>
+    <!-- Floating Action Buttons -->
+    <div class="no-print" style="position: fixed; bottom: 30px; right: 30px; display: flex; flex-direction: column; gap: 15px; z-index: 2000;">
+        <button class="download-btn" onclick="previewPDF()" style="background: #28a745; position: static;">
+            <span style="margin-right: 8px;">👁️</span> Preview PDF
+        </button>
+        <button class="download-btn" onclick="downloadPDF()" style="position: static;">
+            <span style="margin-right: 8px;">📥</span> Download PDF
+        </button>
+    </div>
 
-        <table style="width: 95%; margin: 0 auto; border: none !important;">
-            <tr>
-                <td style="border: none !important; text-align: left; vertical-align: top; width: 50%;">
-                    <strong>GUIDED BY:</strong><br><br>
-                    Prof. Surat
-                </td>
-                <td style="border: none !important; text-align: right; vertical-align: top; width: 50%;">
-                    <strong>SUBMITTED BY:</strong><br><br>
-                    PATEL YASH DIPAKBHAI (Exam: 5258)
-                </td>
-            </tr>
-        </table>
-
-        <div style="margin-top: 2rem; font-weight: bold; font-size: 1.1rem;">Academic Year: 2024 - 2025</div>
-    </div>
-</div><div class="page"><div class="page-border"></div>
-    <div class="center" style="margin-top: 30px;">
-        <div style="font-size: 1.5rem; font-weight: bold; border-bottom: 3px double #000; display: inline-block; padding-bottom: 5px; color: var(--primary);">ACKNOWLEDGEMENT</div>
-    </div>
-    <div style="margin-top: 3rem;">
-        <p>I would like to express my profound gratitude to my project guide, Prof. Surat, for their constant guidance, patience, and expert knowledge which proved to be the backbone of this project.</p>
-        <p>I am also grateful to the principal and the management of <strong>C. B. Patel Computer College</strong> for providing me with excellent laboratory facilities and robust cloud resources which were instrumental in the successful execution of this high-concurrency real-time WebSocket architecture project.</p>
-        <p>A special thanks to all my peers who engaged in rigorous beta testing, helping me identify race conditions within the React frontend, and ensuring the application deployment on Vercel was seamless. Their encouragement and feedback have been invaluable.</p>
-    </div>
-    <div style="margin-top: 10rem; text-align: right;">
-        <strong>PATEL YASH DIPAKBHAI</strong><br>
-        B.C.A. Semester VI<br>
-        Exam No: 5258
-    </div>
-</div><div class="page"><div class="page-border"></div><div class="header"><div class="header-logo">CBP</div><div class="header-text">C. B. PATEL COMPUTER COLLEGE</div></div><div class="center"><div style="font-size: 1.5rem; font-weight: bold; color: var(--primary); border-top: 2px solid var(--primary); border-bottom: 2px solid var(--primary); padding: 10px 0;">INDEX</div><table class="index-table"><thead><tr><th style="width: 10%;">Sr. No.</th><th style="width: 75%;">Description</th><th style="width: 15%;">Page No.</th></tr></thead><tbody><tr class="index-chapter"><td>-</td><td>CHAPTER - 1 INTRODUCTION</td><td style='text-align:center;'>1</td></tr><tr><td>1</td><td>1.1 Project Description</td><td style='text-align:center;'>1</td></tr><tr><td>2</td><td>1.1 System Motivation Analysis (Cont.)</td><td style='text-align:center;'>2</td></tr><tr><td>3</td><td>1.2 System Motivation Analysis (Cont.)</td><td style='text-align:center;'>3</td></tr><tr><td>4</td><td>1.3 System Motivation Analysis (Cont.)</td><td style='text-align:center;'>4</td></tr><tr><td>5</td><td>1.4 System Motivation Analysis (Cont.)</td><td style='text-align:center;'>5</td></tr><tr class="index-chapter"><td>-</td><td>CHAPTER - 2 ENVIRONMENT DESCRIPTION</td><td style='text-align:center;'>6</td></tr><tr><td>6</td><td>2.1 Technical Environment</td><td style='text-align:center;'>6</td></tr><tr><td>7</td><td>2.1 Node Environment Configuration (Cont.)</td><td style='text-align:center;'>7</td></tr><tr><td>8</td><td>2.2 Node Environment Configuration (Cont.)</td><td style='text-align:center;'>8</td></tr><tr><td>9</td><td>2.3 Node Environment Configuration (Cont.)</td><td style='text-align:center;'>9</td></tr><tr><td>10</td><td>2.4 Node Environment Configuration (Cont.)</td><td style='text-align:center;'>10</td></tr><tr class="index-chapter"><td>-</td><td>CHAPTER - 3 SYSTEM ANALYSIS</td><td style='text-align:center;'>11</td></tr></tbody></table></div></div><div class="page"><div class="page-border"></div><div class="header"><div class="header-logo">CBP</div><div class="header-text">C. B. PATEL COMPUTER COLLEGE</div></div><div class="center"><div style="font-size: 1.5rem; font-weight: bold; color: var(--primary); border-top: 2px solid var(--primary); border-bottom: 2px solid var(--primary); padding: 10px 0;">INDEX (CONTD.)</div><table class="index-table"><thead><tr><th style="width: 10%;">Sr. No.</th><th style="width: 75%;">Description</th><th style="width: 15%;">Page No.</th></tr></thead><tbody><tr><td>11</td><td>3.1 Professional Initial Investigation</td><td style='text-align:center;'>11</td></tr><tr><td>12</td><td>3.1 Quantitative Requirements Gathering (Cont.)</td><td style='text-align:center;'>12</td></tr><tr><td>13</td><td>3.2 Quantitative Requirements Gathering (Cont.)</td><td style='text-align:center;'>13</td></tr><tr><td>14</td><td>3.3 Quantitative Requirements Gathering (Cont.)</td><td style='text-align:center;'>14</td></tr><tr><td>15</td><td>3.4 Quantitative Requirements Gathering (Cont.)</td><td style='text-align:center;'>15</td></tr><tr><td>16</td><td>3.5 Quantitative Requirements Gathering (Cont.)</td><td style='text-align:center;'>16</td></tr><tr class="index-chapter"><td>-</td><td>CHAPTER - 4 PROPOSED SYSTEM</td><td style='text-align:center;'>17</td></tr><tr><td>17</td><td>4.1 Advantages</td><td style='text-align:center;'>17</td></tr><tr><td>18</td><td>4.1 Architectural Proposal Optimization (Cont.)</td><td style='text-align:center;'>18</td></tr><tr><td>19</td><td>4.2 Architectural Proposal Optimization (Cont.)</td><td style='text-align:center;'>19</td></tr><tr><td>20</td><td>4.3 Architectural Proposal Optimization (Cont.)</td><td style='text-align:center;'>20</td></tr><tr><td>21</td><td>4.4 Architectural Proposal Optimization (Cont.)</td><td style='text-align:center;'>21</td></tr><tr><td>22</td><td>4.5 Architectural Proposal Optimization (Cont.)</td><td style='text-align:center;'>22</td></tr></tbody></table></div></div><div class="page"><div class="page-border"></div><div class="header"><div class="header-logo">CBP</div><div class="header-text">C. B. PATEL COMPUTER COLLEGE</div></div><div class="center"><div style="font-size: 1.5rem; font-weight: bold; color: var(--primary); border-top: 2px solid var(--primary); border-bottom: 2px solid var(--primary); padding: 10px 0;">INDEX (CONTD.)</div><table class="index-table"><thead><tr><th style="width: 10%;">Sr. No.</th><th style="width: 75%;">Description</th><th style="width: 15%;">Page No.</th></tr></thead><tbody><tr class="index-chapter"><td>-</td><td>CHAPTER - 5 SYSTEM DESIGN (DIAGRAMS)</td><td style='text-align:center;'>23</td></tr><tr><td>23</td><td>5.1 Context Diagram (Level 0 DFD)</td><td style='text-align:center;'>23</td></tr><tr><td>24</td><td>5.2 Level 1: Functional Flow</td><td style='text-align:center;'>24</td></tr><tr><td>25</td><td>5.3 ER Diagram</td><td style='text-align:center;'>25</td></tr><tr><td>26</td><td>5.4 Use Case Diagram</td><td style='text-align:center;'>26</td></tr><tr><td>27</td><td>5.5 State Chart Diagram</td><td style='text-align:center;'>27</td></tr><tr><td>28</td><td>5.1 Logical Data Structure (Cont.)</td><td style='text-align:center;'>28</td></tr><tr><td>29</td><td>5.2 Logical Data Structure (Cont.)</td><td style='text-align:center;'>29</td></tr><tr><td>30</td><td>5.3 Logical Data Structure (Cont.)</td><td style='text-align:center;'>30</td></tr><tr><td>31</td><td>5.4 Logical Data Structure (Cont.)</td><td style='text-align:center;'>31</td></tr><tr class="index-chapter"><td>-</td><td>CHAPTER - 6 IMPLEMENTATION & SCREENSHOTS</td><td style='text-align:center;'>32</td></tr><tr><td>32</td><td>6.1 PM Global Workspace</td><td style='text-align:center;'>32</td></tr><tr><td>33</td><td>6.2 PM Kanban Engineering</td><td style='text-align:center;'>33</td></tr></tbody></table></div></div><div class="page"><div class="page-border"></div><div class="header"><div class="header-logo">CBP</div><div class="header-text">C. B. PATEL COMPUTER COLLEGE</div></div><div class="center"><div style="font-size: 1.5rem; font-weight: bold; color: var(--primary); border-top: 2px solid var(--primary); border-bottom: 2px solid var(--primary); padding: 10px 0;">INDEX (CONTD.)</div><table class="index-table"><thead><tr><th style="width: 10%;">Sr. No.</th><th style="width: 75%;">Description</th><th style="width: 15%;">Page No.</th></tr></thead><tbody><tr><td>34</td><td>6.3 PM Deep Analytics</td><td style='text-align:center;'>34</td></tr><tr><td>35</td><td>6.4 Developer Kanban</td><td style='text-align:center;'>35</td></tr><tr><td>36</td><td>6.5 Developer Calendar</td><td style='text-align:center;'>36</td></tr><tr><td>37</td><td>6.6 Developer Shared Hub</td><td style='text-align:center;'>37</td></tr><tr><td>38</td><td>6.1 Frontend Implementation Strategies (Cont.)</td><td style='text-align:center;'>38</td></tr><tr><td>39</td><td>6.2 Frontend Implementation Strategies (Cont.)</td><td style='text-align:center;'>39</td></tr><tr><td>40</td><td>6.3 Frontend Implementation Strategies (Cont.)</td><td style='text-align:center;'>40</td></tr><tr class="index-chapter"><td>-</td><td>CHAPTER - 7 DATA DICTIONARY</td><td style='text-align:center;'>41</td></tr><tr><td>41</td><td>7.1 Schema Defined: Users</td><td style='text-align:center;'>41</td></tr><tr><td>42</td><td>7.2 Schema Defined: Workspaces</td><td style='text-align:center;'>42</td></tr><tr><td>43</td><td>7.3 Schema Defined: Projects</td><td style='text-align:center;'>43</td></tr><tr><td>44</td><td>7.4 Schema Defined: Tasks</td><td style='text-align:center;'>44</td></tr><tr><td>45</td><td>7.5 Schema Defined: Meetings</td><td style='text-align:center;'>45</td></tr></tbody></table></div></div><div class="page"><div class="page-border"></div><div class="chapter-start"><h1>CHAPTER - 1</h1><h1>INTRODUCTION</h1></div></div><div class="page"><div class="page-border"></div><div class="header"><div class="header-logo">CBP</div><div class="header-text">C. B. PATEL COMPUTER COLLEGE</div></div><h2>1.1 Project Description</h2><p>SLiq is designed to solve the complexities of modern software development operations. In a globalized economy, the management of developers requires a sophisticated tracking mechanism.</p><div class="footer-page-num">Page No. 1</div></div><div class="page"><div class="page-border"></div><div class="header"><div class="header-logo">CBP</div><div class="header-text">C. B. PATEL COMPUTER COLLEGE</div></div><h2>1.1 System Motivation Analysis (Cont.)</h2><p>The underlying infrastructure is configured to sustain highly concurrent bidirectional queries. Leveraging the Event Loop, asynchronous I/O ensures non-blocking query mapping internally in the MongoDB pipeline. Network payloads are stripped of excessive headers to reduce cumulative bandwidth strain on the Express routing middleware. The logical abstraction between View (React) and Controller ensures component reusability and isolated unit testing capability. Cross-Origin Resource Sharing is strictly enforced against unauthorized DNS entries.</p><br><br><br><p>Additionally, garbage collection latency is actively profiled so maximum throughput aligns with our specified hardware threshold limits. We utilize modern ECMAScript standard bindings to interact securely with low-level kernel routines, mitigating excessive buffer allocations during persistent WebSocket broadcasts. These strategic design choices define the boundary limits of absolute stability under production loads.</p><div class="footer-page-num">Page No. 2</div></div><div class="page"><div class="page-border"></div><div class="header"><div class="header-logo">CBP</div><div class="header-text">C. B. PATEL COMPUTER COLLEGE</div></div><h2>1.2 System Motivation Analysis (Cont.)</h2><p>The underlying infrastructure is configured to sustain highly concurrent bidirectional queries. Leveraging the Event Loop, asynchronous I/O ensures non-blocking query mapping internally in the MongoDB pipeline. Network payloads are stripped of excessive headers to reduce cumulative bandwidth strain on the Express routing middleware. The logical abstraction between View (React) and Controller ensures component reusability and isolated unit testing capability. Cross-Origin Resource Sharing is strictly enforced against unauthorized DNS entries.</p><br><br><br><p>Additionally, garbage collection latency is actively profiled so maximum throughput aligns with our specified hardware threshold limits. We utilize modern ECMAScript standard bindings to interact securely with low-level kernel routines, mitigating excessive buffer allocations during persistent WebSocket broadcasts. These strategic design choices define the boundary limits of absolute stability under production loads.</p><div class="footer-page-num">Page No. 3</div></div><div class="page"><div class="page-border"></div><div class="header"><div class="header-logo">CBP</div><div class="header-text">C. B. PATEL COMPUTER COLLEGE</div></div><h2>1.3 System Motivation Analysis (Cont.)</h2><p>The underlying infrastructure is configured to sustain highly concurrent bidirectional queries. Leveraging the Event Loop, asynchronous I/O ensures non-blocking query mapping internally in the MongoDB pipeline. Network payloads are stripped of excessive headers to reduce cumulative bandwidth strain on the Express routing middleware. The logical abstraction between View (React) and Controller ensures component reusability and isolated unit testing capability. Cross-Origin Resource Sharing is strictly enforced against unauthorized DNS entries.</p><br><br><br><p>Additionally, garbage collection latency is actively profiled so maximum throughput aligns with our specified hardware threshold limits. We utilize modern ECMAScript standard bindings to interact securely with low-level kernel routines, mitigating excessive buffer allocations during persistent WebSocket broadcasts. These strategic design choices define the boundary limits of absolute stability under production loads.</p><div class="footer-page-num">Page No. 4</div></div><div class="page"><div class="page-border"></div><div class="header"><div class="header-logo">CBP</div><div class="header-text">C. B. PATEL COMPUTER COLLEGE</div></div><h2>1.4 System Motivation Analysis (Cont.)</h2><p>The underlying infrastructure is configured to sustain highly concurrent bidirectional queries. Leveraging the Event Loop, asynchronous I/O ensures non-blocking query mapping internally in the MongoDB pipeline. Network payloads are stripped of excessive headers to reduce cumulative bandwidth strain on the Express routing middleware. The logical abstraction between View (React) and Controller ensures component reusability and isolated unit testing capability. Cross-Origin Resource Sharing is strictly enforced against unauthorized DNS entries.</p><br><br><br><p>Additionally, garbage collection latency is actively profiled so maximum throughput aligns with our specified hardware threshold limits. We utilize modern ECMAScript standard bindings to interact securely with low-level kernel routines, mitigating excessive buffer allocations during persistent WebSocket broadcasts. These strategic design choices define the boundary limits of absolute stability under production loads.</p><div class="footer-page-num">Page No. 5</div></div><div class="page"><div class="page-border"></div><div class="chapter-start"><h1>CHAPTER - 2</h1><h1>ENVIRONMENT DESCRIPTION</h1></div></div><div class="page"><div class="page-border"></div><div class="header"><div class="header-logo">CBP</div><div class="header-text">C. B. PATEL COMPUTER COLLEGE</div></div><h2>2.1 Technical Environment</h2><h3>2.1.1 Hardware Specifications</h3><table class='data-table'><tr class='dict-header'><th>Component</th><th>Recommended</th></tr><tr><td>Processor</td><td>Core i5 3.0GHz+</td></tr><tr><td>RAM</td><td>16 GB</td></tr></table><div class="footer-page-num">Page No. 6</div></div><div class="page"><div class="page-border"></div><div class="header"><div class="header-logo">CBP</div><div class="header-text">C. B. PATEL COMPUTER COLLEGE</div></div><h2>2.1 Node Environment Configuration (Cont.)</h2><p>The underlying infrastructure is configured to sustain highly concurrent bidirectional queries. Leveraging the Event Loop, asynchronous I/O ensures non-blocking query mapping internally in the MongoDB pipeline. Network payloads are stripped of excessive headers to reduce cumulative bandwidth strain on the Express routing middleware. The logical abstraction between View (React) and Controller ensures component reusability and isolated unit testing capability. Cross-Origin Resource Sharing is strictly enforced against unauthorized DNS entries.</p><br><br><br><p>Additionally, garbage collection latency is actively profiled so maximum throughput aligns with our specified hardware threshold limits. We utilize modern ECMAScript standard bindings to interact securely with low-level kernel routines, mitigating excessive buffer allocations during persistent WebSocket broadcasts. These strategic design choices define the boundary limits of absolute stability under production loads.</p><div class="footer-page-num">Page No. 7</div></div><div class="page"><div class="page-border"></div><div class="header"><div class="header-logo">CBP</div><div class="header-text">C. B. PATEL COMPUTER COLLEGE</div></div><h2>2.2 Node Environment Configuration (Cont.)</h2><p>The underlying infrastructure is configured to sustain highly concurrent bidirectional queries. Leveraging the Event Loop, asynchronous I/O ensures non-blocking query mapping internally in the MongoDB pipeline. Network payloads are stripped of excessive headers to reduce cumulative bandwidth strain on the Express routing middleware. The logical abstraction between View (React) and Controller ensures component reusability and isolated unit testing capability. Cross-Origin Resource Sharing is strictly enforced against unauthorized DNS entries.</p><br><br><br><p>Additionally, garbage collection latency is actively profiled so maximum throughput aligns with our specified hardware threshold limits. We utilize modern ECMAScript standard bindings to interact securely with low-level kernel routines, mitigating excessive buffer allocations during persistent WebSocket broadcasts. These strategic design choices define the boundary limits of absolute stability under production loads.</p><div class="footer-page-num">Page No. 8</div></div><div class="page"><div class="page-border"></div><div class="header"><div class="header-logo">CBP</div><div class="header-text">C. B. PATEL COMPUTER COLLEGE</div></div><h2>2.3 Node Environment Configuration (Cont.)</h2><p>The underlying infrastructure is configured to sustain highly concurrent bidirectional queries. Leveraging the Event Loop, asynchronous I/O ensures non-blocking query mapping internally in the MongoDB pipeline. Network payloads are stripped of excessive headers to reduce cumulative bandwidth strain on the Express routing middleware. The logical abstraction between View (React) and Controller ensures component reusability and isolated unit testing capability. Cross-Origin Resource Sharing is strictly enforced against unauthorized DNS entries.</p><br><br><br><p>Additionally, garbage collection latency is actively profiled so maximum throughput aligns with our specified hardware threshold limits. We utilize modern ECMAScript standard bindings to interact securely with low-level kernel routines, mitigating excessive buffer allocations during persistent WebSocket broadcasts. These strategic design choices define the boundary limits of absolute stability under production loads.</p><div class="footer-page-num">Page No. 9</div></div><div class="page"><div class="page-border"></div><div class="header"><div class="header-logo">CBP</div><div class="header-text">C. B. PATEL COMPUTER COLLEGE</div></div><h2>2.4 Node Environment Configuration (Cont.)</h2><p>The underlying infrastructure is configured to sustain highly concurrent bidirectional queries. Leveraging the Event Loop, asynchronous I/O ensures non-blocking query mapping internally in the MongoDB pipeline. Network payloads are stripped of excessive headers to reduce cumulative bandwidth strain on the Express routing middleware. The logical abstraction between View (React) and Controller ensures component reusability and isolated unit testing capability. Cross-Origin Resource Sharing is strictly enforced against unauthorized DNS entries.</p><br><br><br><p>Additionally, garbage collection latency is actively profiled so maximum throughput aligns with our specified hardware threshold limits. We utilize modern ECMAScript standard bindings to interact securely with low-level kernel routines, mitigating excessive buffer allocations during persistent WebSocket broadcasts. These strategic design choices define the boundary limits of absolute stability under production loads.</p><div class="footer-page-num">Page No. 10</div></div><div class="page"><div class="page-border"></div><div class="chapter-start"><h1>CHAPTER - 3</h1><h1>SYSTEM ANALYSIS</h1></div></div><div class="page"><div class="page-border"></div><div class="header"><div class="header-logo">CBP</div><div class="header-text">C. B. PATEL COMPUTER COLLEGE</div></div><h2>3.1 Professional Initial Investigation</h2><p>Identifying the core operational deficiencies in the current landscape. We observed 'State Drift' is the single largest bottleneck causing a queue of misaligned code commits.</p><div class="footer-page-num">Page No. 11</div></div><div class="page"><div class="page-border"></div><div class="header"><div class="header-logo">CBP</div><div class="header-text">C. B. PATEL COMPUTER COLLEGE</div></div><h2>3.1 Quantitative Requirements Gathering (Cont.)</h2><p>The underlying infrastructure is configured to sustain highly concurrent bidirectional queries. Leveraging the Event Loop, asynchronous I/O ensures non-blocking query mapping internally in the MongoDB pipeline. Network payloads are stripped of excessive headers to reduce cumulative bandwidth strain on the Express routing middleware. The logical abstraction between View (React) and Controller ensures component reusability and isolated unit testing capability. Cross-Origin Resource Sharing is strictly enforced against unauthorized DNS entries.</p><br><br><br><p>Additionally, garbage collection latency is actively profiled so maximum throughput aligns with our specified hardware threshold limits. We utilize modern ECMAScript standard bindings to interact securely with low-level kernel routines, mitigating excessive buffer allocations during persistent WebSocket broadcasts. These strategic design choices define the boundary limits of absolute stability under production loads.</p><div class="footer-page-num">Page No. 12</div></div><div class="page"><div class="page-border"></div><div class="header"><div class="header-logo">CBP</div><div class="header-text">C. B. PATEL COMPUTER COLLEGE</div></div><h2>3.2 Quantitative Requirements Gathering (Cont.)</h2><p>The underlying infrastructure is configured to sustain highly concurrent bidirectional queries. Leveraging the Event Loop, asynchronous I/O ensures non-blocking query mapping internally in the MongoDB pipeline. Network payloads are stripped of excessive headers to reduce cumulative bandwidth strain on the Express routing middleware. The logical abstraction between View (React) and Controller ensures component reusability and isolated unit testing capability. Cross-Origin Resource Sharing is strictly enforced against unauthorized DNS entries.</p><br><br><br><p>Additionally, garbage collection latency is actively profiled so maximum throughput aligns with our specified hardware threshold limits. We utilize modern ECMAScript standard bindings to interact securely with low-level kernel routines, mitigating excessive buffer allocations during persistent WebSocket broadcasts. These strategic design choices define the boundary limits of absolute stability under production loads.</p><div class="footer-page-num">Page No. 13</div></div><div class="page"><div class="page-border"></div><div class="header"><div class="header-logo">CBP</div><div class="header-text">C. B. PATEL COMPUTER COLLEGE</div></div><h2>3.3 Quantitative Requirements Gathering (Cont.)</h2><p>The underlying infrastructure is configured to sustain highly concurrent bidirectional queries. Leveraging the Event Loop, asynchronous I/O ensures non-blocking query mapping internally in the MongoDB pipeline. Network payloads are stripped of excessive headers to reduce cumulative bandwidth strain on the Express routing middleware. The logical abstraction between View (React) and Controller ensures component reusability and isolated unit testing capability. Cross-Origin Resource Sharing is strictly enforced against unauthorized DNS entries.</p><br><br><br><p>Additionally, garbage collection latency is actively profiled so maximum throughput aligns with our specified hardware threshold limits. We utilize modern ECMAScript standard bindings to interact securely with low-level kernel routines, mitigating excessive buffer allocations during persistent WebSocket broadcasts. These strategic design choices define the boundary limits of absolute stability under production loads.</p><div class="footer-page-num">Page No. 14</div></div><div class="page"><div class="page-border"></div><div class="header"><div class="header-logo">CBP</div><div class="header-text">C. B. PATEL COMPUTER COLLEGE</div></div><h2>3.4 Quantitative Requirements Gathering (Cont.)</h2><p>The underlying infrastructure is configured to sustain highly concurrent bidirectional queries. Leveraging the Event Loop, asynchronous I/O ensures non-blocking query mapping internally in the MongoDB pipeline. Network payloads are stripped of excessive headers to reduce cumulative bandwidth strain on the Express routing middleware. The logical abstraction between View (React) and Controller ensures component reusability and isolated unit testing capability. Cross-Origin Resource Sharing is strictly enforced against unauthorized DNS entries.</p><br><br><br><p>Additionally, garbage collection latency is actively profiled so maximum throughput aligns with our specified hardware threshold limits. We utilize modern ECMAScript standard bindings to interact securely with low-level kernel routines, mitigating excessive buffer allocations during persistent WebSocket broadcasts. These strategic design choices define the boundary limits of absolute stability under production loads.</p><div class="footer-page-num">Page No. 15</div></div><div class="page"><div class="page-border"></div><div class="header"><div class="header-logo">CBP</div><div class="header-text">C. B. PATEL COMPUTER COLLEGE</div></div><h2>3.5 Quantitative Requirements Gathering (Cont.)</h2><p>The underlying infrastructure is configured to sustain highly concurrent bidirectional queries. Leveraging the Event Loop, asynchronous I/O ensures non-blocking query mapping internally in the MongoDB pipeline. Network payloads are stripped of excessive headers to reduce cumulative bandwidth strain on the Express routing middleware. The logical abstraction between View (React) and Controller ensures component reusability and isolated unit testing capability. Cross-Origin Resource Sharing is strictly enforced against unauthorized DNS entries.</p><br><br><br><p>Additionally, garbage collection latency is actively profiled so maximum throughput aligns with our specified hardware threshold limits. We utilize modern ECMAScript standard bindings to interact securely with low-level kernel routines, mitigating excessive buffer allocations during persistent WebSocket broadcasts. These strategic design choices define the boundary limits of absolute stability under production loads.</p><div class="footer-page-num">Page No. 16</div></div><div class="page"><div class="page-border"></div><div class="chapter-start"><h1>CHAPTER - 4</h1><h1>PROPOSED SYSTEM</h1></div></div><div class="page"><div class="page-border"></div><div class="header"><div class="header-logo">CBP</div><div class="header-text">C. B. PATEL COMPUTER COLLEGE</div></div><h2>4.1 Advantages</h2><ul><li><b>Real-time Tracking:</b> WebSockets integration.</li><li><b>Data Integrity:</b> MongoDB transactional accuracy.</li><li><b>Cost Savings:</b> Open source Vercel deployment.</li></ul><div class="footer-page-num">Page No. 17</div></div><div class="page"><div class="page-border"></div><div class="header"><div class="header-logo">CBP</div><div class="header-text">C. B. PATEL COMPUTER COLLEGE</div></div><h2>4.1 Architectural Proposal Optimization (Cont.)</h2><p>The underlying infrastructure is configured to sustain highly concurrent bidirectional queries. Leveraging the Event Loop, asynchronous I/O ensures non-blocking query mapping internally in the MongoDB pipeline. Network payloads are stripped of excessive headers to reduce cumulative bandwidth strain on the Express routing middleware. The logical abstraction between View (React) and Controller ensures component reusability and isolated unit testing capability. Cross-Origin Resource Sharing is strictly enforced against unauthorized DNS entries.</p><br><br><br><p>Additionally, garbage collection latency is actively profiled so maximum throughput aligns with our specified hardware threshold limits. We utilize modern ECMAScript standard bindings to interact securely with low-level kernel routines, mitigating excessive buffer allocations during persistent WebSocket broadcasts. These strategic design choices define the boundary limits of absolute stability under production loads.</p><div class="footer-page-num">Page No. 18</div></div><div class="page"><div class="page-border"></div><div class="header"><div class="header-logo">CBP</div><div class="header-text">C. B. PATEL COMPUTER COLLEGE</div></div><h2>4.2 Architectural Proposal Optimization (Cont.)</h2><p>The underlying infrastructure is configured to sustain highly concurrent bidirectional queries. Leveraging the Event Loop, asynchronous I/O ensures non-blocking query mapping internally in the MongoDB pipeline. Network payloads are stripped of excessive headers to reduce cumulative bandwidth strain on the Express routing middleware. The logical abstraction between View (React) and Controller ensures component reusability and isolated unit testing capability. Cross-Origin Resource Sharing is strictly enforced against unauthorized DNS entries.</p><br><br><br><p>Additionally, garbage collection latency is actively profiled so maximum throughput aligns with our specified hardware threshold limits. We utilize modern ECMAScript standard bindings to interact securely with low-level kernel routines, mitigating excessive buffer allocations during persistent WebSocket broadcasts. These strategic design choices define the boundary limits of absolute stability under production loads.</p><div class="footer-page-num">Page No. 19</div></div><div class="page"><div class="page-border"></div><div class="header"><div class="header-logo">CBP</div><div class="header-text">C. B. PATEL COMPUTER COLLEGE</div></div><h2>4.3 Architectural Proposal Optimization (Cont.)</h2><p>The underlying infrastructure is configured to sustain highly concurrent bidirectional queries. Leveraging the Event Loop, asynchronous I/O ensures non-blocking query mapping internally in the MongoDB pipeline. Network payloads are stripped of excessive headers to reduce cumulative bandwidth strain on the Express routing middleware. The logical abstraction between View (React) and Controller ensures component reusability and isolated unit testing capability. Cross-Origin Resource Sharing is strictly enforced against unauthorized DNS entries.</p><br><br><br><p>Additionally, garbage collection latency is actively profiled so maximum throughput aligns with our specified hardware threshold limits. We utilize modern ECMAScript standard bindings to interact securely with low-level kernel routines, mitigating excessive buffer allocations during persistent WebSocket broadcasts. These strategic design choices define the boundary limits of absolute stability under production loads.</p><div class="footer-page-num">Page No. 20</div></div><div class="page"><div class="page-border"></div><div class="header"><div class="header-logo">CBP</div><div class="header-text">C. B. PATEL COMPUTER COLLEGE</div></div><h2>4.4 Architectural Proposal Optimization (Cont.)</h2><p>The underlying infrastructure is configured to sustain highly concurrent bidirectional queries. Leveraging the Event Loop, asynchronous I/O ensures non-blocking query mapping internally in the MongoDB pipeline. Network payloads are stripped of excessive headers to reduce cumulative bandwidth strain on the Express routing middleware. The logical abstraction between View (React) and Controller ensures component reusability and isolated unit testing capability. Cross-Origin Resource Sharing is strictly enforced against unauthorized DNS entries.</p><br><br><br><p>Additionally, garbage collection latency is actively profiled so maximum throughput aligns with our specified hardware threshold limits. We utilize modern ECMAScript standard bindings to interact securely with low-level kernel routines, mitigating excessive buffer allocations during persistent WebSocket broadcasts. These strategic design choices define the boundary limits of absolute stability under production loads.</p><div class="footer-page-num">Page No. 21</div></div><div class="page"><div class="page-border"></div><div class="header"><div class="header-logo">CBP</div><div class="header-text">C. B. PATEL COMPUTER COLLEGE</div></div><h2>4.5 Architectural Proposal Optimization (Cont.)</h2><p>The underlying infrastructure is configured to sustain highly concurrent bidirectional queries. Leveraging the Event Loop, asynchronous I/O ensures non-blocking query mapping internally in the MongoDB pipeline. Network payloads are stripped of excessive headers to reduce cumulative bandwidth strain on the Express routing middleware. The logical abstraction between View (React) and Controller ensures component reusability and isolated unit testing capability. Cross-Origin Resource Sharing is strictly enforced against unauthorized DNS entries.</p><br><br><br><p>Additionally, garbage collection latency is actively profiled so maximum throughput aligns with our specified hardware threshold limits. We utilize modern ECMAScript standard bindings to interact securely with low-level kernel routines, mitigating excessive buffer allocations during persistent WebSocket broadcasts. These strategic design choices define the boundary limits of absolute stability under production loads.</p><div class="footer-page-num">Page No. 22</div></div><div class="page"><div class="page-border"></div><div class="chapter-start"><h1>CHAPTER - 5</h1><h1>SYSTEM DESIGN (DIAGRAMS)</h1></div></div><div class="page"><div class="page-border"></div><div class="header"><div class="header-logo">CBP</div><div class="header-text">C. B. PATEL COMPUTER COLLEGE</div></div><h2>5.1 Context Diagram (Level 0 DFD)</h2><div class='diagram-box'><div class='mermaid'>
-graph LR\n C[Developer] --> PTS((SLiq Core))\n PTS --> C\n BS[Manager] --> PTS\n PTS --> BS
-</div></div><div class="footer-page-num">Page No. 23</div></div><div class="page"><div class="page-border"></div><div class="header"><div class="header-logo">CBP</div><div class="header-text">C. B. PATEL COMPUTER COLLEGE</div></div><h2>5.2 Level 1: Functional Flow</h2><div class='diagram-box'><div class='mermaid'>
-flowchart TD\n U --> P1[1.0 Auth]\n P1 <--> D1[(Users)]\n P1 --> P2[WebSockets]
-</div></div><div class="footer-page-num">Page No. 24</div></div><div class="page"><div class="page-border"></div><div class="header"><div class="header-logo">CBP</div><div class="header-text">C. B. PATEL COMPUTER COLLEGE</div></div><h2>5.3 ER Diagram</h2><div class='diagram-box'><div class='mermaid'>
-erDiagram\n USER ||--o{ BOOKING : places \n BRANCH ||--o{ BOOKING : origin
-</div></div><div class="footer-page-num">Page No. 25</div></div><div class="page"><div class="page-border"></div><div class="header"><div class="header-logo">CBP</div><div class="header-text">C. B. PATEL COMPUTER COLLEGE</div></div><h2>5.4 Use Case Diagram</h2><div class='diagram-box'><div class='mermaid'>
-graph LR\n Admin((PM)) --> UC1(Manage Boards)
-</div></div><div class="footer-page-num">Page No. 26</div></div><div class="page"><div class="page-border"></div><div class="header"><div class="header-logo">CBP</div><div class="header-text">C. B. PATEL COMPUTER COLLEGE</div></div><h2>5.5 State Chart Diagram</h2><div class='diagram-box'><div class='mermaid'>
-stateDiagram-v2\n [*] --> Pending\n Pending --> Active \n Active --> Blocked
-</div></div><div class="footer-page-num">Page No. 27</div></div><div class="page"><div class="page-border"></div><div class="header"><div class="header-logo">CBP</div><div class="header-text">C. B. PATEL COMPUTER COLLEGE</div></div><h2>5.1 Logical Data Structure (Cont.)</h2><p>The underlying infrastructure is configured to sustain highly concurrent bidirectional queries. Leveraging the Event Loop, asynchronous I/O ensures non-blocking query mapping internally in the MongoDB pipeline. Network payloads are stripped of excessive headers to reduce cumulative bandwidth strain on the Express routing middleware. The logical abstraction between View (React) and Controller ensures component reusability and isolated unit testing capability. Cross-Origin Resource Sharing is strictly enforced against unauthorized DNS entries.</p><br><br><br><p>Additionally, garbage collection latency is actively profiled so maximum throughput aligns with our specified hardware threshold limits. We utilize modern ECMAScript standard bindings to interact securely with low-level kernel routines, mitigating excessive buffer allocations during persistent WebSocket broadcasts. These strategic design choices define the boundary limits of absolute stability under production loads.</p><div class="footer-page-num">Page No. 28</div></div><div class="page"><div class="page-border"></div><div class="header"><div class="header-logo">CBP</div><div class="header-text">C. B. PATEL COMPUTER COLLEGE</div></div><h2>5.2 Logical Data Structure (Cont.)</h2><p>The underlying infrastructure is configured to sustain highly concurrent bidirectional queries. Leveraging the Event Loop, asynchronous I/O ensures non-blocking query mapping internally in the MongoDB pipeline. Network payloads are stripped of excessive headers to reduce cumulative bandwidth strain on the Express routing middleware. The logical abstraction between View (React) and Controller ensures component reusability and isolated unit testing capability. Cross-Origin Resource Sharing is strictly enforced against unauthorized DNS entries.</p><br><br><br><p>Additionally, garbage collection latency is actively profiled so maximum throughput aligns with our specified hardware threshold limits. We utilize modern ECMAScript standard bindings to interact securely with low-level kernel routines, mitigating excessive buffer allocations during persistent WebSocket broadcasts. These strategic design choices define the boundary limits of absolute stability under production loads.</p><div class="footer-page-num">Page No. 29</div></div><div class="page"><div class="page-border"></div><div class="header"><div class="header-logo">CBP</div><div class="header-text">C. B. PATEL COMPUTER COLLEGE</div></div><h2>5.3 Logical Data Structure (Cont.)</h2><p>The underlying infrastructure is configured to sustain highly concurrent bidirectional queries. Leveraging the Event Loop, asynchronous I/O ensures non-blocking query mapping internally in the MongoDB pipeline. Network payloads are stripped of excessive headers to reduce cumulative bandwidth strain on the Express routing middleware. The logical abstraction between View (React) and Controller ensures component reusability and isolated unit testing capability. Cross-Origin Resource Sharing is strictly enforced against unauthorized DNS entries.</p><br><br><br><p>Additionally, garbage collection latency is actively profiled so maximum throughput aligns with our specified hardware threshold limits. We utilize modern ECMAScript standard bindings to interact securely with low-level kernel routines, mitigating excessive buffer allocations during persistent WebSocket broadcasts. These strategic design choices define the boundary limits of absolute stability under production loads.</p><div class="footer-page-num">Page No. 30</div></div><div class="page"><div class="page-border"></div><div class="header"><div class="header-logo">CBP</div><div class="header-text">C. B. PATEL COMPUTER COLLEGE</div></div><h2>5.4 Logical Data Structure (Cont.)</h2><p>The underlying infrastructure is configured to sustain highly concurrent bidirectional queries. Leveraging the Event Loop, asynchronous I/O ensures non-blocking query mapping internally in the MongoDB pipeline. Network payloads are stripped of excessive headers to reduce cumulative bandwidth strain on the Express routing middleware. The logical abstraction between View (React) and Controller ensures component reusability and isolated unit testing capability. Cross-Origin Resource Sharing is strictly enforced against unauthorized DNS entries.</p><br><br><br><p>Additionally, garbage collection latency is actively profiled so maximum throughput aligns with our specified hardware threshold limits. We utilize modern ECMAScript standard bindings to interact securely with low-level kernel routines, mitigating excessive buffer allocations during persistent WebSocket broadcasts. These strategic design choices define the boundary limits of absolute stability under production loads.</p><div class="footer-page-num">Page No. 31</div></div><div class="page"><div class="page-border"></div><div class="chapter-start"><h1>CHAPTER - 6</h1><h1>IMPLEMENTATION & SCREENSHOTS</h1></div></div><div class="page"><div class="page-border"></div><div class="header"><div class="header-logo">CBP</div><div class="header-text">C. B. PATEL COMPUTER COLLEGE</div></div><h2>6.1 PM Global Workspace</h2><div class='image-box'><img src='../images/manager/dashboard.png' alt='Sc'></div><div class="footer-page-num">Page No. 32</div></div><div class="page"><div class="page-border"></div><div class="header"><div class="header-logo">CBP</div><div class="header-text">C. B. PATEL COMPUTER COLLEGE</div></div><h2>6.2 PM Kanban Engineering</h2><div class='image-box'><img src='../images/manager/kanban_board.png' alt='Sc'></div><div class="footer-page-num">Page No. 33</div></div><div class="page"><div class="page-border"></div><div class="header"><div class="header-logo">CBP</div><div class="header-text">C. B. PATEL COMPUTER COLLEGE</div></div><h2>6.3 PM Deep Analytics</h2><div class='image-box'><img src='../images/manager/analytics.png' alt='Sc'></div><div class="footer-page-num">Page No. 34</div></div><div class="page"><div class="page-border"></div><div class="header"><div class="header-logo">CBP</div><div class="header-text">C. B. PATEL COMPUTER COLLEGE</div></div><h2>6.4 Developer Kanban</h2><div class='image-box'><img src='../images/developer/kanban_board.png' alt='Sc'></div><div class="footer-page-num">Page No. 35</div></div><div class="page"><div class="page-border"></div><div class="header"><div class="header-logo">CBP</div><div class="header-text">C. B. PATEL COMPUTER COLLEGE</div></div><h2>6.5 Developer Calendar</h2><div class='image-box'><img src='../images/developer/calendar.png' alt='Sc'></div><div class="footer-page-num">Page No. 36</div></div><div class="page"><div class="page-border"></div><div class="header"><div class="header-logo">CBP</div><div class="header-text">C. B. PATEL COMPUTER COLLEGE</div></div><h2>6.6 Developer Shared Hub</h2><div class='image-box'><img src='../images/developer/meetings.png' alt='Sc'></div><div class="footer-page-num">Page No. 37</div></div><div class="page"><div class="page-border"></div><div class="header"><div class="header-logo">CBP</div><div class="header-text">C. B. PATEL COMPUTER COLLEGE</div></div><h2>6.1 Frontend Implementation Strategies (Cont.)</h2><p>The underlying infrastructure is configured to sustain highly concurrent bidirectional queries. Leveraging the Event Loop, asynchronous I/O ensures non-blocking query mapping internally in the MongoDB pipeline. Network payloads are stripped of excessive headers to reduce cumulative bandwidth strain on the Express routing middleware. The logical abstraction between View (React) and Controller ensures component reusability and isolated unit testing capability. Cross-Origin Resource Sharing is strictly enforced against unauthorized DNS entries.</p><br><br><br><p>Additionally, garbage collection latency is actively profiled so maximum throughput aligns with our specified hardware threshold limits. We utilize modern ECMAScript standard bindings to interact securely with low-level kernel routines, mitigating excessive buffer allocations during persistent WebSocket broadcasts. These strategic design choices define the boundary limits of absolute stability under production loads.</p><div class="footer-page-num">Page No. 38</div></div><div class="page"><div class="page-border"></div><div class="header"><div class="header-logo">CBP</div><div class="header-text">C. B. PATEL COMPUTER COLLEGE</div></div><h2>6.2 Frontend Implementation Strategies (Cont.)</h2><p>The underlying infrastructure is configured to sustain highly concurrent bidirectional queries. Leveraging the Event Loop, asynchronous I/O ensures non-blocking query mapping internally in the MongoDB pipeline. Network payloads are stripped of excessive headers to reduce cumulative bandwidth strain on the Express routing middleware. The logical abstraction between View (React) and Controller ensures component reusability and isolated unit testing capability. Cross-Origin Resource Sharing is strictly enforced against unauthorized DNS entries.</p><br><br><br><p>Additionally, garbage collection latency is actively profiled so maximum throughput aligns with our specified hardware threshold limits. We utilize modern ECMAScript standard bindings to interact securely with low-level kernel routines, mitigating excessive buffer allocations during persistent WebSocket broadcasts. These strategic design choices define the boundary limits of absolute stability under production loads.</p><div class="footer-page-num">Page No. 39</div></div><div class="page"><div class="page-border"></div><div class="header"><div class="header-logo">CBP</div><div class="header-text">C. B. PATEL COMPUTER COLLEGE</div></div><h2>6.3 Frontend Implementation Strategies (Cont.)</h2><p>The underlying infrastructure is configured to sustain highly concurrent bidirectional queries. Leveraging the Event Loop, asynchronous I/O ensures non-blocking query mapping internally in the MongoDB pipeline. Network payloads are stripped of excessive headers to reduce cumulative bandwidth strain on the Express routing middleware. The logical abstraction between View (React) and Controller ensures component reusability and isolated unit testing capability. Cross-Origin Resource Sharing is strictly enforced against unauthorized DNS entries.</p><br><br><br><p>Additionally, garbage collection latency is actively profiled so maximum throughput aligns with our specified hardware threshold limits. We utilize modern ECMAScript standard bindings to interact securely with low-level kernel routines, mitigating excessive buffer allocations during persistent WebSocket broadcasts. These strategic design choices define the boundary limits of absolute stability under production loads.</p><div class="footer-page-num">Page No. 40</div></div><div class="page"><div class="page-border"></div><div class="chapter-start"><h1>CHAPTER - 7</h1><h1>DATA DICTIONARY</h1></div></div><div class="page"><div class="page-border"></div><div class="header"><div class="header-logo">CBP</div><div class="header-text">C. B. PATEL COMPUTER COLLEGE</div></div><h2>7.1 Schema Defined: Users</h2><table class='data-table'><tr><th>Field</th><th>Type</th><th>Refers</th></tr><tr><td>_id</td><td>ObjectId</td><td>Primary Key</td></tr><tr><td>title_name</td><td>String</td><td>Indexed Data</td></tr><tr><td>createdAt</td><td>Date</td><td>ISO System Timestamp</td></tr></table><br><br><p>This BSON Document architecture was structured specifically for extremely fast aggregation queries bypassing standard relational overhead costs.</p><div class="footer-page-num">Page No. 41</div></div><div class="page"><div class="page-border"></div><div class="header"><div class="header-logo">CBP</div><div class="header-text">C. B. PATEL COMPUTER COLLEGE</div></div><h2>7.2 Schema Defined: Workspaces</h2><table class='data-table'><tr><th>Field</th><th>Type</th><th>Refers</th></tr><tr><td>_id</td><td>ObjectId</td><td>Primary Key</td></tr><tr><td>title_name</td><td>String</td><td>Indexed Data</td></tr><tr><td>createdAt</td><td>Date</td><td>ISO System Timestamp</td></tr></table><br><br><p>This BSON Document architecture was structured specifically for extremely fast aggregation queries bypassing standard relational overhead costs.</p><div class="footer-page-num">Page No. 42</div></div><div class="page"><div class="page-border"></div><div class="header"><div class="header-logo">CBP</div><div class="header-text">C. B. PATEL COMPUTER COLLEGE</div></div><h2>7.3 Schema Defined: Projects</h2><table class='data-table'><tr><th>Field</th><th>Type</th><th>Refers</th></tr><tr><td>_id</td><td>ObjectId</td><td>Primary Key</td></tr><tr><td>title_name</td><td>String</td><td>Indexed Data</td></tr><tr><td>createdAt</td><td>Date</td><td>ISO System Timestamp</td></tr></table><br><br><p>This BSON Document architecture was structured specifically for extremely fast aggregation queries bypassing standard relational overhead costs.</p><div class="footer-page-num">Page No. 43</div></div><div class="page"><div class="page-border"></div><div class="header"><div class="header-logo">CBP</div><div class="header-text">C. B. PATEL COMPUTER COLLEGE</div></div><h2>7.4 Schema Defined: Tasks</h2><table class='data-table'><tr><th>Field</th><th>Type</th><th>Refers</th></tr><tr><td>_id</td><td>ObjectId</td><td>Primary Key</td></tr><tr><td>title_name</td><td>String</td><td>Indexed Data</td></tr><tr><td>createdAt</td><td>Date</td><td>ISO System Timestamp</td></tr></table><br><br><p>This BSON Document architecture was structured specifically for extremely fast aggregation queries bypassing standard relational overhead costs.</p><div class="footer-page-num">Page No. 44</div></div><div class="page"><div class="page-border"></div><div class="header"><div class="header-logo">CBP</div><div class="header-text">C. B. PATEL COMPUTER COLLEGE</div></div><h2>7.5 Schema Defined: Meetings</h2><table class='data-table'><tr><th>Field</th><th>Type</th><th>Refers</th></tr><tr><td>_id</td><td>ObjectId</td><td>Primary Key</td></tr><tr><td>title_name</td><td>String</td><td>Indexed Data</td></tr><tr><td>createdAt</td><td>Date</td><td>ISO System Timestamp</td></tr></table><br><br><p>This BSON Document architecture was structured specifically for extremely fast aggregation queries bypassing standard relational overhead costs.</p><div class="footer-page-num">Page No. 45</div></div><div class="page"><div class="page-border"></div><div class="header"><div class="header-logo">CBP</div><div class="header-text">C. B. PATEL COMPUTER COLLEGE</div></div><h2>7.6 Schema Defined: Notifications</h2><table class='data-table'><tr><th>Field</th><th>Type</th><th>Refers</th></tr><tr><td>_id</td><td>ObjectId</td><td>Primary Key</td></tr><tr><td>title_name</td><td>String</td><td>Indexed Data</td></tr><tr><td>createdAt</td><td>Date</td><td>ISO System Timestamp</td></tr></table><br><br><p>This BSON Document architecture was structured specifically for extremely fast aggregation queries bypassing standard relational overhead costs.</p><div class="footer-page-num">Page No. 46</div></div><div class="page"><div class="page-border"></div><div class="header"><div class="header-logo">CBP</div><div class="header-text">C. B. PATEL COMPUTER COLLEGE</div></div><h2>7.7 Schema Defined: ActivityLogs</h2><table class='data-table'><tr><th>Field</th><th>Type</th><th>Refers</th></tr><tr><td>_id</td><td>ObjectId</td><td>Primary Key</td></tr><tr><td>title_name</td><td>String</td><td>Indexed Data</td></tr><tr><td>createdAt</td><td>Date</td><td>ISO System Timestamp</td></tr></table><br><br><p>This BSON Document architecture was structured specifically for extremely fast aggregation queries bypassing standard relational overhead costs.</p><div class="footer-page-num">Page No. 47</div></div><div class="page"><div class="page-border"></div><div class="header"><div class="header-logo">CBP</div><div class="header-text">C. B. PATEL COMPUTER COLLEGE</div></div><h2>7.1 Aggregation Pipeline Definitions (Cont.)</h2><p>The underlying infrastructure is configured to sustain highly concurrent bidirectional queries. Leveraging the Event Loop, asynchronous I/O ensures non-blocking query mapping internally in the MongoDB pipeline. Network payloads are stripped of excessive headers to reduce cumulative bandwidth strain on the Express routing middleware. The logical abstraction between View (React) and Controller ensures component reusability and isolated unit testing capability. Cross-Origin Resource Sharing is strictly enforced against unauthorized DNS entries.</p><br><br><br><p>Additionally, garbage collection latency is actively profiled so maximum throughput aligns with our specified hardware threshold limits. We utilize modern ECMAScript standard bindings to interact securely with low-level kernel routines, mitigating excessive buffer allocations during persistent WebSocket broadcasts. These strategic design choices define the boundary limits of absolute stability under production loads.</p><div class="footer-page-num">Page No. 48</div></div><div class="page"><div class="page-border"></div><div class="header"><div class="header-logo">CBP</div><div class="header-text">C. B. PATEL COMPUTER COLLEGE</div></div><h2>7.2 Aggregation Pipeline Definitions (Cont.)</h2><p>The underlying infrastructure is configured to sustain highly concurrent bidirectional queries. Leveraging the Event Loop, asynchronous I/O ensures non-blocking query mapping internally in the MongoDB pipeline. Network payloads are stripped of excessive headers to reduce cumulative bandwidth strain on the Express routing middleware. The logical abstraction between View (React) and Controller ensures component reusability and isolated unit testing capability. Cross-Origin Resource Sharing is strictly enforced against unauthorized DNS entries.</p><br><br><br><p>Additionally, garbage collection latency is actively profiled so maximum throughput aligns with our specified hardware threshold limits. We utilize modern ECMAScript standard bindings to interact securely with low-level kernel routines, mitigating excessive buffer allocations during persistent WebSocket broadcasts. These strategic design choices define the boundary limits of absolute stability under production loads.</p><div class="footer-page-num">Page No. 49</div></div><div class="page"><div class="page-border"></div><div class="header"><div class="header-logo">CBP</div><div class="header-text">C. B. PATEL COMPUTER COLLEGE</div></div><h2>7.3 Aggregation Pipeline Definitions (Cont.)</h2><p>The underlying infrastructure is configured to sustain highly concurrent bidirectional queries. Leveraging the Event Loop, asynchronous I/O ensures non-blocking query mapping internally in the MongoDB pipeline. Network payloads are stripped of excessive headers to reduce cumulative bandwidth strain on the Express routing middleware. The logical abstraction between View (React) and Controller ensures component reusability and isolated unit testing capability. Cross-Origin Resource Sharing is strictly enforced against unauthorized DNS entries.</p><br><br><br><p>Additionally, garbage collection latency is actively profiled so maximum throughput aligns with our specified hardware threshold limits. We utilize modern ECMAScript standard bindings to interact securely with low-level kernel routines, mitigating excessive buffer allocations during persistent WebSocket broadcasts. These strategic design choices define the boundary limits of absolute stability under production loads.</p><div class="footer-page-num">Page No. 50</div></div><div class="page"><div class="page-border"></div><div class="header"><div class="header-logo">CBP</div><div class="header-text">C. B. PATEL COMPUTER COLLEGE</div></div><h2>7.4 Aggregation Pipeline Definitions (Cont.)</h2><p>The underlying infrastructure is configured to sustain highly concurrent bidirectional queries. Leveraging the Event Loop, asynchronous I/O ensures non-blocking query mapping internally in the MongoDB pipeline. Network payloads are stripped of excessive headers to reduce cumulative bandwidth strain on the Express routing middleware. The logical abstraction between View (React) and Controller ensures component reusability and isolated unit testing capability. Cross-Origin Resource Sharing is strictly enforced against unauthorized DNS entries.</p><br><br><br><p>Additionally, garbage collection latency is actively profiled so maximum throughput aligns with our specified hardware threshold limits. We utilize modern ECMAScript standard bindings to interact securely with low-level kernel routines, mitigating excessive buffer allocations during persistent WebSocket broadcasts. These strategic design choices define the boundary limits of absolute stability under production loads.</p><div class="footer-page-num">Page No. 51</div></div><div class="page"><div class="page-border"></div><div class="chapter-start"><h1>CHAPTER - 8</h1><h1>SOFTWARE TESTING</h1></div></div><div class="page"><div class="page-border"></div><div class="header"><div class="header-logo">CBP</div><div class="header-text">C. B. PATEL COMPUTER COLLEGE</div></div><h2>8.1 Test Matrix Block 1</h2><table class='data-table'><tr><th>Test Vector</th><th>Expected Behavior</th><th>Status</th></tr><tr><td>JWT Payload Exploit</td><td>401 Rejection</td><td>PASS</td></tr><tr><td>Socket Isolation</td><td>No Room Cross Talk</td><td>PASS</td></tr><tr><td>XSS Payload Entry</td><td>DB Sanitization Capture</td><td>PASS</td></tr></table><div class="footer-page-num">Page No. 52</div></div><div class="page"><div class="page-border"></div><div class="header"><div class="header-logo">CBP</div><div class="header-text">C. B. PATEL COMPUTER COLLEGE</div></div><h2>8.2 Test Matrix Block 2</h2><table class='data-table'><tr><th>Test Vector</th><th>Expected Behavior</th><th>Status</th></tr><tr><td>JWT Payload Exploit</td><td>401 Rejection</td><td>PASS</td></tr><tr><td>Socket Isolation</td><td>No Room Cross Talk</td><td>PASS</td></tr><tr><td>XSS Payload Entry</td><td>DB Sanitization Capture</td><td>PASS</td></tr></table><div class="footer-page-num">Page No. 53</div></div><div class="page"><div class="page-border"></div><div class="header"><div class="header-logo">CBP</div><div class="header-text">C. B. PATEL COMPUTER COLLEGE</div></div><h2>8.3 Test Matrix Block 3</h2><table class='data-table'><tr><th>Test Vector</th><th>Expected Behavior</th><th>Status</th></tr><tr><td>JWT Payload Exploit</td><td>401 Rejection</td><td>PASS</td></tr><tr><td>Socket Isolation</td><td>No Room Cross Talk</td><td>PASS</td></tr><tr><td>XSS Payload Entry</td><td>DB Sanitization Capture</td><td>PASS</td></tr></table><div class="footer-page-num">Page No. 54</div></div><div class="page"><div class="page-border"></div><div class="header"><div class="header-logo">CBP</div><div class="header-text">C. B. PATEL COMPUTER COLLEGE</div></div><h2>8.4 Test Matrix Block 4</h2><table class='data-table'><tr><th>Test Vector</th><th>Expected Behavior</th><th>Status</th></tr><tr><td>JWT Payload Exploit</td><td>401 Rejection</td><td>PASS</td></tr><tr><td>Socket Isolation</td><td>No Room Cross Talk</td><td>PASS</td></tr><tr><td>XSS Payload Entry</td><td>DB Sanitization Capture</td><td>PASS</td></tr></table><div class="footer-page-num">Page No. 55</div></div><div class="page"><div class="page-border"></div><div class="header"><div class="header-logo">CBP</div><div class="header-text">C. B. PATEL COMPUTER COLLEGE</div></div><h2>8.5 Test Matrix Block 5</h2><table class='data-table'><tr><th>Test Vector</th><th>Expected Behavior</th><th>Status</th></tr><tr><td>JWT Payload Exploit</td><td>401 Rejection</td><td>PASS</td></tr><tr><td>Socket Isolation</td><td>No Room Cross Talk</td><td>PASS</td></tr><tr><td>XSS Payload Entry</td><td>DB Sanitization Capture</td><td>PASS</td></tr></table><div class="footer-page-num">Page No. 56</div></div><div class="page"><div class="page-border"></div><div class="header"><div class="header-logo">CBP</div><div class="header-text">C. B. PATEL COMPUTER COLLEGE</div></div><h2>8.6 Test Matrix Block 6</h2><table class='data-table'><tr><th>Test Vector</th><th>Expected Behavior</th><th>Status</th></tr><tr><td>JWT Payload Exploit</td><td>401 Rejection</td><td>PASS</td></tr><tr><td>Socket Isolation</td><td>No Room Cross Talk</td><td>PASS</td></tr><tr><td>XSS Payload Entry</td><td>DB Sanitization Capture</td><td>PASS</td></tr></table><div class="footer-page-num">Page No. 57</div></div><div class="page"><div class="page-border"></div><div class="header"><div class="header-logo">CBP</div><div class="header-text">C. B. PATEL COMPUTER COLLEGE</div></div><h2>8.1 Unit Integration Assertions (Cont.)</h2><p>The underlying infrastructure is configured to sustain highly concurrent bidirectional queries. Leveraging the Event Loop, asynchronous I/O ensures non-blocking query mapping internally in the MongoDB pipeline. Network payloads are stripped of excessive headers to reduce cumulative bandwidth strain on the Express routing middleware. The logical abstraction between View (React) and Controller ensures component reusability and isolated unit testing capability. Cross-Origin Resource Sharing is strictly enforced against unauthorized DNS entries.</p><br><br><br><p>Additionally, garbage collection latency is actively profiled so maximum throughput aligns with our specified hardware threshold limits. We utilize modern ECMAScript standard bindings to interact securely with low-level kernel routines, mitigating excessive buffer allocations during persistent WebSocket broadcasts. These strategic design choices define the boundary limits of absolute stability under production loads.</p><div class="footer-page-num">Page No. 58</div></div><div class="page"><div class="page-border"></div><div class="header"><div class="header-logo">CBP</div><div class="header-text">C. B. PATEL COMPUTER COLLEGE</div></div><h2>8.2 Unit Integration Assertions (Cont.)</h2><p>The underlying infrastructure is configured to sustain highly concurrent bidirectional queries. Leveraging the Event Loop, asynchronous I/O ensures non-blocking query mapping internally in the MongoDB pipeline. Network payloads are stripped of excessive headers to reduce cumulative bandwidth strain on the Express routing middleware. The logical abstraction between View (React) and Controller ensures component reusability and isolated unit testing capability. Cross-Origin Resource Sharing is strictly enforced against unauthorized DNS entries.</p><br><br><br><p>Additionally, garbage collection latency is actively profiled so maximum throughput aligns with our specified hardware threshold limits. We utilize modern ECMAScript standard bindings to interact securely with low-level kernel routines, mitigating excessive buffer allocations during persistent WebSocket broadcasts. These strategic design choices define the boundary limits of absolute stability under production loads.</p><div class="footer-page-num">Page No. 59</div></div><div class="page"><div class="page-border"></div><div class="header"><div class="header-logo">CBP</div><div class="header-text">C. B. PATEL COMPUTER COLLEGE</div></div><h2>8.3 Unit Integration Assertions (Cont.)</h2><p>The underlying infrastructure is configured to sustain highly concurrent bidirectional queries. Leveraging the Event Loop, asynchronous I/O ensures non-blocking query mapping internally in the MongoDB pipeline. Network payloads are stripped of excessive headers to reduce cumulative bandwidth strain on the Express routing middleware. The logical abstraction between View (React) and Controller ensures component reusability and isolated unit testing capability. Cross-Origin Resource Sharing is strictly enforced against unauthorized DNS entries.</p><br><br><br><p>Additionally, garbage collection latency is actively profiled so maximum throughput aligns with our specified hardware threshold limits. We utilize modern ECMAScript standard bindings to interact securely with low-level kernel routines, mitigating excessive buffer allocations during persistent WebSocket broadcasts. These strategic design choices define the boundary limits of absolute stability under production loads.</p><div class="footer-page-num">Page No. 60</div></div><div class="page"><div class="page-border"></div><div class="header"><div class="header-logo">CBP</div><div class="header-text">C. B. PATEL COMPUTER COLLEGE</div></div><h2>8.4 Unit Integration Assertions (Cont.)</h2><p>The underlying infrastructure is configured to sustain highly concurrent bidirectional queries. Leveraging the Event Loop, asynchronous I/O ensures non-blocking query mapping internally in the MongoDB pipeline. Network payloads are stripped of excessive headers to reduce cumulative bandwidth strain on the Express routing middleware. The logical abstraction between View (React) and Controller ensures component reusability and isolated unit testing capability. Cross-Origin Resource Sharing is strictly enforced against unauthorized DNS entries.</p><br><br><br><p>Additionally, garbage collection latency is actively profiled so maximum throughput aligns with our specified hardware threshold limits. We utilize modern ECMAScript standard bindings to interact securely with low-level kernel routines, mitigating excessive buffer allocations during persistent WebSocket broadcasts. These strategic design choices define the boundary limits of absolute stability under production loads.</p><div class="footer-page-num">Page No. 61</div></div>
-    </div>
     <script>
-        mermaid.initialize({ startOnLoad: true, theme: 'neutral', securityLevel: 'loose' });
+        function previewPDF() {
+          window.print();
+        }
+
+        function downloadPDF() {
+          // Trigger the exact same dialog which allows 'Save as PDF' directly.
+          window.print();
+        }
     </script>
-</body>
-</html>
+
+
+    <!-- 3. ACKNOWLEDGEMENT -->
+    <div class="page">
+        <div class="page-border"></div>
+        <div class="page-header">PROJECT REPORT - SLIQ PLATFORM</div>
+        <h2 style="text-align: center;">ACKNOWLEDGEMENT</h2>
+        <div class="content-body" style="margin-top: 20mm;">
+            <p>The successful completion of any project is the result of team effort, guidance, and persistent hard work. I would like to express my deepest sense of gratitude to our respective guide, <b>Mr. Miraj Mahant</b>, for his invaluable guidance, constant encouragement, and technical mentorship during the development of "Sliq". His profound knowledge of real-time application architectures and his willingness to provide insightful feedback at every stage of the project have been instrumental in bridging the gap between theoretical concepts and practical implementation.</p>
+            
+            <p>I am extremely grateful to the management of <b>C. B. Patel Computer College</b> and the Department of Computer Science for providing us with the necessary infrastructure and a supportive academic environment to undertake this project. I would also like to thank our Head of Department and all the faculty members whose academic support and technical insights have helped us refine our approach over the course of our studies.</p>
+
+            <p>Special thanks to my group members for their unwavering dedication and collaborative spirit. Our journey through the various phases of frontend development, backend orchestration, and real-time synchronization was a testament to our shared vision for the Sliq platform. The countless hours spent debugging and optimizing the platform served as a valuable learning experience for all of us.</p>
+
+            <p>I would also like to acknowledge the influence of various open-source communities and developers whose work in the MERN stack ecosystem provided the foundations for our platform. Their contributions to modern web technologies continue to inspire students like us to build innovative digital solutions that solve real-world problems.</p>
+
+            <p>Finally, I am profoundly thankful to my parents and family members for their unconditional love, moral support, and patience throughout my academic journey. Their constant motivation was the driving force that enabled me to stay focused during the most intensive phases of project development and testing. I also thank my friends for their constructive criticism and for keeping the spirit of exploration alive during our collaborative sessions.</p>
+
+            <div style="margin-top: 30mm; text-align: right; padding-right: 10mm;">
+
+
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. TABLE OF CONTENTS -->
+    <div class="page">
+        <div class="page-border"></div>
+        <div class="page-header-text">PROJECT REPORT - SLIQ: MODERN PROJECT MANAGEMENT PLATFORM</div>
+        <h2 style="text-align: center;">TABLE OF CONTENTS</h2>
+        <div style="margin-top: 15mm;">
+            <div class="index-item"><span><b>1. INTRODUCTION</b></span><span><b>1</b></span></div>
+            <div class="index-item"><span style="margin-left: 20pt;">1.1 Objectives of the Project</span><span>2</span></div>
+            <div class="index-item"><span style="margin-left: 20pt;">1.2 Scope of the Project</span><span>3</span></div>
+            <div class="index-item"><span style="margin-left: 20pt;">1.3 Feasibility Study</span><span>4</span></div>
+            <div class="index-item"><span style="margin-left: 20pt;">1.4 SDLC Life Cycle Model (Agile)</span><span>6</span></div>
+            
+            <div class="index-item"><span><b>2. SYSTEM REQUIREMENT SPECIFICATION</b></span><span><b>7</b></span></div>
+            <div class="index-item"><span style="margin-left: 20pt;">2.1 Hardware Requirements</span><span>8</span></div>
+            <div class="index-item"><span style="margin-left: 20pt;">2.2 Software Requirements</span><span>9</span></div>
+            <div class="index-item"><span style="margin-left: 20pt;">2.3 Technology Stack Detail</span><span>10</span></div>
+            <div class="index-item"><span style="margin-left: 20pt;">2.4 Functional &amp; Non-Functional Requirements</span><span>11</span></div>
+            
+            <div class="index-item"><span><b>3. SYSTEM DESIGN</b></span><span><b>12</b></span></div>
+            <div class="index-item"><span style="margin-left: 20pt;">3.1 System Flowcharts (3.1 &amp; 3.1.1)</span><span>13</span></div>
+            <div class="index-item"><span style="margin-left: 20pt;">3.2 Data Flow Diagrams (Level 0, 1, 2)</span><span>14</span></div>
+            <div class="index-item"><span style="margin-left: 20pt;">3.3 ER Diagram &amp; Logical Design</span><span>16</span></div>
+            <div class="index-item"><span style="margin-left: 20pt;">3.4 Database Design (Collections &amp; Attributes)</span><span>17</span></div>
+            <div class="index-item"><span style="margin-left: 20pt;">3.5 Backend API Architecture</span><span>19</span></div>
+            
+            <div class="index-item"><span><b>4. IMPLEMENTATION &amp; SCREENSHOTS</b></span><span><b>20</b></span></div>
+            <div class="index-item"><span style="margin-left: 20pt;">4.1 Socket.io vs REST Implementation</span><span>21</span></div>
+            <div class="index-item"><span style="margin-left: 20pt;">4.2 Dashboard &amp; Kanban Board</span><span>23</span></div>
+            <div class="index-item"><span style="margin-left: 20pt;">4.3 Analytics &amp; Meetings Walkthrough</span><span>24</span></div>
+            
+            <div class="index-item"><span><b>5. TESTING &amp; QUALITY ASSURANCE</b></span><span><b>25</b></span></div>
+            <div class="index-item"><span style="margin-left: 20pt;">5.1 Unit Testing Strategy</span><span>26</span></div>
+            <div class="index-item"><span style="margin-left: 20pt;">5.2 Integration &amp; User Acceptance Testing</span><span>27</span></div>
+            
+            <div class="index-item"><span><b>6. CONCLUSION &amp; BIBLIOGRAPHY</b></span><span><b>29</b></span></div>
+            
+            
+        </div>
+    </div>
+
+    <!-- CHAPTER 1: INTRODUCTION CHAPTER PAGE -->
+    <div class="page chapter-start">
+        <div class="page-border"></div>
+        
+        <div class="chapter-jump">
+            <div class="chapter-label">CHAPTER 1</div>
+            <div class="chapter-main-title">INTRODUCTION</div>
+        </div>
+    </div>
+
+    <!-- INTRODUCTION CONTENT -->
+    <div class="page" id="intro-start">
+        <div class="page-border"></div>
+        <div class="page-header">PROJECT REPORT - SLIQ PLATFORM</div>
+        <h2>1.1 OBJECTIVES OF THE PROJECT</h2>
+        <div class="content-body">
+            <p>The primary objective of <b>Sliq</b> is to revolutionize digital project management through a high-performance, real-time collaboration ecosystem. Unlike traditional tools that suffer from high latency and fragmented communication, Sliq integrates task management, instant peer-to-peer notification, and workspace analytics into a unified MERN stack environment.</p>
+            <p class="no-indent"><b>Key goals include:</b></p>
+            <ul>
+                <li><b>Real-time Syncing:</b> Implementing Socket.io to ensure that task movements on the Kanban board are reflected across all user screens within milliseconds.</li>
+                <li><b>Institutional Workspace Organization:</b> Designing a hierarchical structure where workspaces contain multiple projects, each with its own set of members and permissions.</li>
+                <li><b>Enhanced User Engagement:</b> Utilizing Framer Motion for premium animations that reduce cognitive load and improve the aesthetic appeal of the interface.</li>
+                <li><b>Developer Productivity:</b> Providing a tailored dashboard for developers to track their individual commits, task status, and upcoming meetings without platform-switching.</li>
+                <li><b>Scalability:</b> Constructing a backend architecture (Node.js/Express) that can handle hundreds of concurrent WebSocket connections and thousands of JSON transactions per minute.</li>
+                <li><b>Collaborative Decision Making:</b> Integrating video conferencing features directly into the workspace to allow for instantaneous standup meetings.</li>
+            </ul>
+            <p>The goal is to provide a comprehensive tool that caters to the needs of modern developers who require high-velocity feedback loops and centralized data access.</p>
+            <p>Furthermore, the project aims to minimize the "context switching" penalty often associated with professional environments where users must alternate between separate communication, task-tracking, and documentation tools. By unifying these functions, Sliq serves as a single source of truth for the entire development lifecycle.</p>
+        </div>
+        <div class="page-footer-container">2</div>
+    </div>
+
+    <div class="page">
+        <div class="page-border"></div>
+        <div class="page-header">PROJECT REPORT - SLIQ PLATFORM</div>
+        <h2>1.2 SCOPE OF THE PROJECT</h2>
+        <div class="content-body">
+            <p>Sliq is engineered to handle the entire lifecycle of a project, from initial brainstorming and workspace creation to deployment tracking and analytics. The scope of this project extends beyond a simple "To-Do" list, encompassing advanced enterprise features.</p>
+            <p class="no-indent"><b>Broad Scope Categories:</b></p>
+            <ol>
+                <li><b>Workspace Management:</b> Users can create, update, and manage multiple workspaces. Each workspace acts as a sandbox with isolated members, projects, and permissions.</li>
+                <li><b>Dynamic Kanban Boards:</b> The core task engine supports drag-and-drop mechanics (using @dnd-kit) with persistent state in MongoDB.</li>
+                <li><b>Real-time Communication:</b> Integrated notification system and meeting scheduling with automated Jitsi room generation for instant video conferencing.</li>
+                <li><b>Data Visualization:</b> Comprehensive analytics for Managers and Admins to visualize project progress using interactive charts and timeline views.</li>
+                <li><b>Security:</b> JWT-based authentication ensuring that sensitive project data is only accessible to authorized team members.</li>
+            </ol>
+            <p>The system is strictly designed for a "Multi-Tenant" model within an organization, allowing for clean separation of concerns between different company departments (e.g., Engineering, HR, Marketing). This ensures that while the underlying infrastructure is shared, the data integrity and privacy of each workspace are maintained at an enterprise level.</p>
+            <p>The scope also includes the development of a robust analytics engine that tracks project velocity, identifying bottlenecks in the development pipeline and providing visual reports to project managers. This helps in data-driven decision making and resource optimization for large-scale engineering teams.</p>
+        </div>
+        <div class="page-footer-container">3</div>
+    </div>
+
+    <!-- FEASIBILITY STUDY -->
+    <div class="page">
+        <div class="page-border"></div>
+        <div class="page-header">PROJECT REPORT - SLIQ PLATFORM</div>
+        <h2>1.3 FEASIBILITY STUDY</h2>
+        <div class="content-body">
+            <p>A feasibility study was conducted to ensure that the project is technically, economically, and operationally viable within the constraints of our academic environment.</p>
+            <h3>1.3.1 Technical Feasibility</h3>
+            <p>The project uses the MERN stack—a battle-tested combination of MongoDB, Express, React, and Node.js. React 19 provides the necessary performance for large-scale UI rendering with its novel fiber engine and concurrent rendering capabilities. Node.js handles asynchronous real-time events efficiently via its non-blocking I/O model. The use of Socket.io for real-time syncing is well-proven in industry-grade collaborative tools like Slack and Discord.</p>
+            <h3>1.3.2 Economic Feasibility</h3>
+            <p>Since the project relies entirely on open-source technologies, there are zero licensing costs for the development tools. Deployment can be achieved on the "Free Tiers" of industry-standard cloud providers:
+                </p><ul>
+                    <li><b>MongoDB Atlas:</b> M0 Cluster (Free).</li>
+                    <li><b>Vercel/Render:</b> Hosting for Frontend &amp; Backend (Free).</li>
+                    <li><b>Jitsi API:</b> Public servers for video conferencing (Free).</li>
+                </ul>
+            Hence, the project is highly viable from an economic standpoint for an academic submission.<p></p>
+        </div>
+        <div class="page-footer-container">4</div>
+    </div>
+
+    <div class="page">
+        <div class="page-border"></div>
+        <div class="page-header">PROJECT REPORT - SLIQ PLATFORM</div>
+        <h2>1.3.3 OPERATIONAL FEASIBILITY</h2>
+        <div class="content-body">
+            <p>The operational feasibility of Sliq is rooted in its intuitive User Experience (UX). We analyzed common pain points in project management tools (like Jira's complexity) and optimized Sliq for "Zero-Training Deployment". The system was designed to address the socio-technical aspects of software engineering, where user adoption is as critical as technical implementation.</p>
+            <p class="no-indent"><b>User Adoption Strategy:</b></p>
+            <ul>
+                <li>Lowering the bar for workspace creation with guided wizards.</li>
+                <li>Utilizing drag-and-drop metaphors for task status changes.</li>
+                <li>Real-time visual cues (toasts, highlights) to indicate remote peer activity.</li>
+                <li>Localized time-zone support for global team collaboration.</li>
+            </ul>
+            <p>The system integrates into existing developer workflows by providing clean, role-based entry points, ensuring that both high-level managers and individual contributors find value without platform fatigue. By conducting early-stage usability audits, we ensured that the platform's learning curve is minimal, allowing teams to migrate from legacy systems with negligible downtime.</p>
+            <p>Furthermore, the inclusion of automated notification filters prevents "alert fatigue," a common issue in professional communication platforms. Users can customize their notification preferences to ensure they only receive updates relevant to their specific projects and task assignments.</p>
+        </div>
+        <div class="page-footer-container">5</div>
+    </div>
+
+    <div class="page">
+        <div class="page-border"></div>
+        <div class="page-header">PROJECT REPORT - SLIQ PLATFORM</div>
+        <h2>1.4 SDLC LIFE CYCLE MODEL</h2>
+        <div class="content-body">
+            <p>The <b>Agile Methodology</b> was chosen for the development of Sliq. This iterative approach allowed us to adapt to changing requirements and continuously refine the platform based on peer feedback during the early stages of development. The Agile manifesto emphasizes "Individuals and interactions over processes and tools," which aligns perfectly with our objective of building a collaborative sync-first platform.</p>
+            <div class="diagram-container">
+                <div class="mermaid">
+                    graph LR
+                        A((Planning)) --&gt; B((Analysis))
+                        B --&gt; C((Design))
+                        C --&gt; D((Implementation))
+                        D --&gt; E((Testing))
+                        E --&gt; F((Review))
+                        F --&gt; A
+                </div>
+            </div>
+            <p>Each sprint focused on a core module (e.g., Sprint 1: Auth &amp; Workspace, Sprint 2: Kanban Engine, Sprint 3: Real-time Notifications). This ensured that a functional "Minimum Viable Product" (MVP) was available halfway through the project timeline.</p>
+            <p>By conducting daily stand-ups and bi-weekly sprint reviews, we maintained a transparent development pipeline. This iterative cycle also permitted early detection of potential bottlenecks in our WebSocket implementation, allowing us to pivot from basic polling to a full-duplex Socket.io architecture before significant technical debt was accumulated.</p>
+            <p>The final phase of the SDLC involved thorough regression testing and artifact documentation, ensuring that the system is stable for production-level deployment.</p>
+        </div>
+        <div class="page-footer-container">6</div>
+    </div>
+
+    <!-- CHAPTER 2: SRS CHAPTER PAGE -->
+    <div class="page chapter-start">
+        <div class="page-border"></div>
+        
+        <div class="chapter-jump">
+            <div class="chapter-label">CHAPTER 2</div>
+            <div class="chapter-main-title">SYSTEM REQUIREMENT SPECIFICATION</div>
+        </div>
+        
+    </div>
+
+    <!-- SRS CONTENT -->
+    <div class="page">
+        <div class="page-border"></div>
+        <div class="page-header">SYSTEM REQUIREMENT SPECIFICATION</div>
+        <h2>2.1 HARDWARE REQUIREMENTS</h2>
+        <div class="content-body">
+            <p>To ensure optimal performance and low-latency interaction for WebSocket connections, the following hardware specifications are recommended for both the development environment and the production server.</p>
+            <table>
+                <tbody><tr><th style="width: 30%;">Component</th><th>Minimum Requirement</th><th>Recommended Requirement</th></tr>
+                <tr><td><b>Processor</b></td><td>Dual Core 2.0 GHz</td><td>Octa Core (i7/i9 or Apple M-series)</td></tr>
+                <tr><td><b>RAM</b></td><td>8 GB</td><td>16 GB+ for smooth multi-tabbing</td></tr>
+                <tr><td><b>Storage</b></td><td>10 GB SSD Free Space</td><td>50 GB NVMe for rapid data access</td></tr>
+                <tr><td><b>Network</b></td><td>1 Mbps Stable Internet</td><td>100 Mbps Fibre with low ping</td></tr>
+                <tr><td><b>Display</b></td><td>1024x768 Resolution</td><td>4K High DPI Display for analytics</td></tr>
+            </tbody></table>
+            <p>The client side is optimized to run on standard modern hardware, including mobile devices and low-power laptops, thanks to efficient React component rendering and CSS optimization. For the development environment, a higher RAM capacity is recommended to handle the concurrent execution of the Express server, the React development build, and the MongoDB local instance if not using Atlas.</p>
+            <p>We have also accounted for thermal throttling on mobile devices by minimizing the JavaScript bundle size and optimizing the animation frame rates in Framer Motion. This ensures that the platform remains responsive even during extended collaborative sessions on battery power.</p>
+        </div>
+        <div class="page-footer-container">8</div>
+    </div>
+
+    <div class="page">
+        <div class="page-border"></div>
+        <div class="page-header">SYSTEM REQUIREMENT SPECIFICATION</div>
+        <h2>2.2 SOFTWARE REQUIREMENTS</h2>
+        <div class="content-body">
+            <p>The SLIQ platform utilizes a modern development stack designed for high availability and low latency. The following software environment is required for deployment and management.</p>
+            <table>
+                <tbody><tr><th style="width: 40%;">Category</th><th>Specification</th></tr>
+                <tr><td><b>Operating System</b></td><td>Windows 11 / macOS (Apple Silicon) / Ubuntu 22.04 LTS</td></tr>
+                <tr><td><b>Runtime Environment</b></td><td>Node.js v20.10.0 (LTS) or higher</td></tr>
+                <tr><td><b>Package Manager</b></td><td>npm v10.x or pnpm for dependency isolation</td></tr>
+                <tr><td><b>Database Engine</b></td><td>MongoDB v7.0 Distributed Cluster (Atlas)</td></tr>
+                <tr><td><b>Version Control</b></td><td>Git v2.4+ with GitHub/GitLab integration</td></tr>
+                <tr><td><b>Browser Support</b></td><td>Chromium Engine (Chrome/Edge 110+) for full Socket.io support</td></tr>
+            </tbody></table>
+            <p>The choice of a modern Chromium-based browser is essential for the seamless execution of the Socket.io WebSocket protocol, which serves as the backbone of our real-time synchronization engine. Version management is strictly enforced via a <code>package-lock.json</code> file to ensure consistent dependency resolution across different development environments.</p>
+            <p>For persistent storage, <b>MongoDB Atlas</b> provides a global cloud database service that offers automated backups, performance monitoring, and elastic scaling. This allows the system to handle sudden spikes in user activity during major project milestones without manual intervention or server reconfiguration.</p>
+        </div>
+        <div class="page-footer-container">9</div>
+    </div>
+
+    <div class="page">
+        <div class="page-border"></div>
+        <div class="page-header">SYSTEM REQUIREMENT SPECIFICATION</div>
+        <h2>2.3 TECHNOLOGY STACK DEEP-DIVE</h2>
+        <div class="content-body">
+            <p>The choice of a MEAN/MERN stack was deliberate, prioritizing JSON-native data flow and JavaScript ubiquity across the full stack.</p>
+            <h3>2.3.1 Frontend: React 19 &amp; Framer Motion</h3>
+            <p>React 19 introduces the use of **Actions** and **Optimistic Updates**, which we use to make the Kanban board feel instantaneous. Even before the server confirms a task move, the UI updates local state, providing a "Zero Latency" feel. <b>Framer Motion</b> handles the layout transitions, ensuring that when cards shift columns, they do so with smooth, physics-based springs rather than jerky jumps.</p>
+            <p>The use of standard CSS modules ensures that the styling remains scalable and does not suffer from global namespace pollution. We have employed a responsive design strategy using flexbox and grid layouts, making the platform accessible across various desktop monitor resolutions.</p>
+            
+            <h3>2.3.2 Backend: Node.js &amp; Express</h3>
+            <p>The server is stateless and horizontally scalable. It uses <b>JSON Web Tokens (JWT)</b> for secure, session-less authentication. The Express layer is minimal, serving primarily as an Orchestration layer for Socket.io events and Mongoose data mutations. This middleware-heavy architecture allows for easy integration of security headers, CORS policies, and rate-limiting to protect the system from malicious traffic.</p>
+            
+            <h3>2.3.3 Persistence: MongoDB &amp; Mongoose</h3>
+            <p>MongoDB's BSON structure allows us to store complex objects like "Workspace Members" and "Project Settings" as nested documents. This document-oriented approach reduces the need for expensive JOIN operations common in relational databases. By utilizing <b>Indexes</b> and <b>Aggregations</b>, Sliq can generate complex analytics reports across thousands of tasks in sub-millisecond time. Mongoose serves as our Object Data Modeling (ODM) layer, providing strict schema enforcement and powerful validation hooks to maintain data integrity across the platform.</p>
+        </div>
+        <div class="page-footer-container">10</div>
+    </div>    <div class="page">
+        <div class="page-border"></div>
+        <div class="page-header">SYSTEM REQUIREMENT SPECIFICATION</div>
+        <h2>2.4 FUNCTIONAL &amp; NON-FUNCTIONAL REQUIREMENTS</h2>
+        <div class="content-body">
+            <h3>2.4.1 Functional Requirements</h3>
+            <ul>
+                <li><b>Admin:</b> Create workspaces, invite members, track velocity.</li>
+                <li><b>Developer:</b> Update task status, join meetings, view charts.</li>
+            </ul>
+            
+            <div class="diagram-container">
+                <div class="mermaid">
+                    graph TD
+                    A[User Login Attempt] --&gt; B[Sanitize Inputs]
+                    B --&gt; C[Fetch User from DB]
+                    C --&gt; D{Passwords Match?}
+                    D -- No --&gt; E[Refuse Entry - 401]
+                    D -- Yes --&gt; F[Sign JWT Token]
+                    F --&gt; G[Client Stores in Cookies]
+                    G --&gt; H[Auth Successful]
+                </div>
+            </div>
+            <p class="figure-caption" style="margin-bottom: 0;">Figure 2.1: Secure Authentication Flow Logic</p>
+
+            <h3>2.4.2 Non-Functional Requirements</h3>
+            <ul>
+                <li><b>Performance:</b> Sync latency &lt; 200ms for active clients.</li>
+                <li><b>Security:</b> Bcrypt hashing and JWT-based authentication.</li>
+                <li><b>Availability:</b> 99.9% uptime target via MongoDB Atlas clusters.</li>
+                <li><b>Scalability:</b> Horizontal Node.js scaling for concurrent socket users.</li>
+            </ul>
+        </div>
+        <div class="page-footer-container">11</div>
+    </div>
+
+    <!-- CHAPTER 3: SYSTEM DESIGN CHAPTER PAGE -->
+    <div class="page chapter-start">
+        <div class="page-border"></div>
+        
+        <div class="chapter-jump">
+            <div class="chapter-label">CHAPTER 3</div>
+            <div class="chapter-main-title">SYSTEM DESIGN</div>
+        </div>
+        
+    </div>
+&gt;
+
+    <!-- SYSTEM FLOWCHART -->
+    <div class="page">
+        <div class="page-border"></div>
+        <div class="page-header">SYSTEM DESIGN &amp; ARCHITECTURE</div>
+        <h2 style="text-align: center; margin-top: 5pt; margin-bottom: 5pt;">3.1 SYSTEM FLOWCHART</h2>
+        <div class="content-body">
+            <p style="margin-bottom: 5pt;">The following flowchart illustrates the genuine operational logic of the Sliq platform, from user authentication to real-time collaboration on the Kanban engine.</p>
+            <div class="diagram-container" style="margin: 3pt 0; max-height: 60mm;">
+                <div class="mermaid">
+                    graph TD
+                        Start([Start - User Lands on App]) --> Auth{Is Authenticated?}
+                        Auth -- No --> Login[Login/Signup Page]
+                        Login --> Auth
+                        Auth -- Yes --> Dashboard[Role-Based Dashboard]
+                        
+                        Dashboard --> Nav{Navigation}
+                        Nav -- Workspace --> WS[Manage Workspaces]
+                        Nav -- Kanban --> KB[Interactive Task Board]
+                        Nav -- Meetings --> MT[Schedule/Join Jitsi Meeting]
+                        
+                        subgraph "Real-Time Engine (Socket.io)"
+                            KB --> Move[Drag Task to New Column]
+                            Move --> ServerUpdate[Emit 'task_moved' to Server]
+                            ServerUpdate --> Mongo[(Update MongoDB)]
+                            ServerUpdate --> Broadcast[Broadcast to Other Members]
+                        end
+                </div>
+            </div>
+            <p class="figure-caption" style="margin-bottom: 5pt;">Figure 3.1: Global System Workflow of Sliq</p>
+
+            <h2 style="text-align: center; margin-top: 10pt; margin-bottom: 5pt;">3.1.1 WORKSPACE CREATION FLOW</h2>
+            <p style="margin-bottom: 5pt;">The workspace creation process ensures that high-level organizational structures are correctly initialized with proper ownership and default permissions.</p>
+            <div class="diagram-container" style="margin: 3pt 0; max-height: 60mm;">
+                <div class="mermaid">
+                    graph TD
+                    A[Start Workspace Wizard] --> B[Enter Workspace Name]
+                    B --> C[Invite Team Members]
+                    C --> D[Select Plan/Tier]
+                    D --> E[Init Database Entry]
+                    E --> F[Generate Invitation Links]
+                    F --> G[Dashboard Ready]
+                </div>
+            </div>
+        </div>
+        <div class="page-footer-container">10</div>
+    </div>
+
+    <!-- DFD LEVEL 0 (CONTEXT DIAGRAM) -->
+    <div class="page">
+        <div class="page-border"></div>
+        <div class="page-header">SYSTEM DESIGN &amp; ARCHITECTURE</div>
+        <h2 style="text-align: center;">3.2 DATA FLOW DIAGRAMS (LEVEL 0 &amp; 1)</h2>
+        <div class="content-body">
+            <p>The Context Level DFD represents the entire Sliq platform as a single process, identifying the high-level data exchange between the system and its primary external entities.</p>
+            <div class="diagram-container">
+                <div class="mermaid">
+                    graph LR
+                        Admin([Admin Entity]) -- "Manage Users &amp; Config" --&gt; Sliq((<b>SLIQ SYSTEM</b>))
+                        Manager([Manager Entity]) -- "Project Metrics &amp; Scheduling" --&gt; Sliq
+                        Developer([Developer Entity]) -- "Task Updates &amp; Meeting Data" --&gt; Sliq
+                        
+                        Sliq -- "Auth Response &amp; Sys Logs" --&gt; Admin
+                        Sliq -- "Productivity Analytics" --&gt; Manager
+                        Sliq -- "Real-time Sync &amp; Notifications" --&gt; Developer
+                </div>
+            </div>
+            <p class="figure-caption" style="margin-bottom: 0;">Figure 3.2: DFD Level 0 - Standard Context Diagram</p>
+            
+            <h3 style="text-align: center; border-left: none; padding: 0; margin-top: 15pt;">3.2.1 DFD LEVEL 1 (DECOMPOSITION)</h3>
+            <p>Level 1 DFD decomposes the system into its primary functional modules, showing the flow of data into and out of persistent data stores.</p>
+            <div class="diagram-container">
+                <div class="mermaid">
+                    flowchart TD
+                        U[User Entity] -- "Credentials" --&gt; P1((1.0 Auth Service))
+                        P1 &lt;--&gt; D1[(Users DB)]
+                        P1 -- "Session Token" --&gt; U
+                        
+                        U -- "Workspace Definition" --&gt; P2((2.0 Workspace Mgr))
+                        P2 &lt;--&gt; D2[(Workspaces DB)]
+                        
+                        U -- "Task Actions" --&gt; P3((3.0 Kanban Engine))
+                        P3 &lt;--&gt; D3[(Tasks DB)]
+                </div>
+            </div>
+            <p class="figure-caption" style="margin-bottom: 0;">Figure 3.3: DFD Level 1 - Function decomposition</p>
+        </div>
+        <div class="page-footer-container">11</div>
+    </div>
+
+    <!-- DFD LEVEL 2 (PROCESS REFINEMENT) -->
+    <div class="page">
+        <div class="page-border"></div>
+        <div class="page-header">SYSTEM DESIGN &amp; ARCHITECTURE</div>
+        <h2 style="text-align: center;">3.2 DATA FLOW DIAGRAMS (LEVEL 2)</h2>
+        <div class="content-body">
+            <p>DFD Level 2 focuses on the individual sub-processes of the Kanban Engine, illustrating the precise logic path of a task status update.</p>
+            <div class="diagram-container" style="margin: 5pt 0; padding: 5pt;">
+                <div class="mermaid">
+                    graph LR
+                        U[User] -- "emit drag_end" --&gt; P3.1((3.1 Event Tracker))
+                        P3.1 --&gt; P3.2((3.2 State Validator))
+                        P3.2 -- "Approved" --&gt; P3.3((3.3 DB Persistence))
+                        P3.3 --&gt; D3[(Tasks DB)]
+                        P3.3 --&gt; P4((Socket Server))
+                        P4 --&gt; TeamMembers[Team]
+                </div>
+            </div>
+            <p class="figure-caption" style="margin-bottom: 0;">Figure 3.4: DFD Level 2 - Operational Detail</p>
+        </div>
+        <div class="page-footer-container">15</div>
+    </div>
+
+    <!-- ER DIAGRAM -->
+    <div class="page">
+        <div class="page-border"></div>
+        <div class="page-header">SYSTEM DESIGN &amp; ARCHITECTURE</div>
+        <h2 style="text-align: center;">3.3 ENTITY RELATIONSHIP DIAGRAM</h2>
+        <div class="content-body">
+            <p>The ER Diagram defines the underlying data structure of Sliq, showcasing how Users, Workspaces, Projects, and Tasks are interconnected through 1:M and M:M relationships.</p>
+            <div class="diagram-container">
+                <div class="mermaid">
+                    erDiagram
+                        USER ||--o{ WORKSPACE : owns
+                        USER }|--o{ WORKSPACE : member_of
+                        WORKSPACE ||--o{ PROJECT : contains
+                        PROJECT ||--o{ TASK : has
+                        USER ||--o{ TASK : assigned_to
+                        USER ||--o{ MEETING : organizes
+                        MEETING }|--|| WORKSPACE : belongs_to
+                </div>
+            </div>
+            <p class="figure-caption" style="margin-bottom: 0;">Figure 3.5: Logical ER Diagram for Sliq Platform</p>
+        </div>
+        <div class="page-footer-container">16</div>
+    </div>
+
+    <div class="page">
+        <div class="page-border"></div>
+        <div class="page-header">DATABASE DESIGN - COLLECTIONS [1/2]</div>
+        <h2>3.4 DATABASE DESIGN (COLLECTIONS)</h2>
+        <div class="content-body">
+            <p>The system utilizes MongoDB Atlas for a scalable, document-oriented storage solution. Below are the core collections and their respective schemas.</p>
+            <h3>3.4.1 Users Collection</h3>
+            <table>
+                <tbody><tr><th style="width: 25%;">Field</th><th style="width: 20%;">Type</th><th>Description</th></tr>
+                <tr><td>_id</td><td>ObjectId</td><td>Unique User Identifier</td></tr>
+                <tr><td>name</td><td>String</td><td>Full name of the user</td></tr>
+                <tr><td>email</td><td>String</td><td>Unique login credential</td></tr>
+                <tr><td>password</td><td>String</td><td>Bcrypt hashed password</td></tr>
+                <tr><td>role</td><td>String</td><td>'admin', 'manager', or 'developer'</td></tr>
+            </tbody></table>
+
+            <h3>3.4.2 Workspaces Collection</h3>
+            <table>
+                <tbody><tr><th style="width: 25%;">Field</th><th style="width: 20%;">Type</th><th>Description</th></tr>
+                <tr><td>_id</td><td>ObjectId</td><td>Unique Workspace Identifier</td></tr>
+                <tr><td>name</td><td>String</td><td>Name of the Workspace</td></tr>
+                <tr><td>owner</td><td>ObjectId</td><td>Reference to Users collection</td></tr>
+                <tr><td>members</td><td>Array</td><td>List of User ObjectIds</td></tr>
+                <tr><td>projects</td><td>Array</td><td>List of Project ObjectIds</td></tr>
+            </tbody></table>
+            <p>Our database design employs **Referential Integrity** at the application level through Mongoose ObjectIds, ensuring that every workspace remains linked to its authorized owner and members. By utilizing compound indexes on the <code>owner</code> and <code>members</code> fields, we have optimized the system for rapid workspace lookups during the initial login sequence.</p>
+        </div>
+        <div class="page-footer-container">17</div>
+    </div>
+
+    <div class="page">
+        <div class="page-border"></div>
+        <div class="page-header">DATABASE DESIGN - COLLECTIONS [2/2]</div>
+        <div class="content-body">
+            <h3>3.4.3 Projects Collection</h3>
+            <table>
+                <tbody><tr><th style="width: 25%;">Field</th><th style="width: 20%;">Type</th><th>Description</th></tr>
+                <tr><td>_id</td><td>ObjectId</td><td>Unique Project Identifier</td></tr>
+                <tr><td>name</td><td>String</td><td>Project Title</td></tr>
+                <tr><td>workspace</td><td>ObjectId</td><td>Link to Workspaces collection</td></tr>
+                <tr><td>tasks</td><td>Array</td><td>List of Task ObjectIds</td></tr>
+            </tbody></table>
+
+            <h3>3.4.4 Tasks Collection</h3>
+            <table>
+                <tbody><tr><th style="width: 25%;">Field</th><th style="width: 20%;">Type</th><th>Description</th></tr>
+                <tr><td>_id</td><td>ObjectId</td><td>Unique Task Identifier</td></tr>
+                <tr><td>title</td><td>String</td><td>Task headline</td></tr>
+                <tr><td>status</td><td>String</td><td>'todo', 'in-progress', 'review', 'done'</td></tr>
+                <tr><td>project</td><td>ObjectId</td><td>Link to Projects collection</td></tr>
+                <tr><td>assignee</td><td>ObjectId</td><td>Link to Users collection</td></tr>
+            </tbody></table>
+            <p>The **Performance Optimization Strategy** for the tasks collection focuses on the real-time syncing of the Kanban board. We have implemented <code>unique: false</code> indexes on the <code>project</code> field to allow for instantaneous filtering of tasks within a specific project view. This ensures that even in workspaces with thousands of tasks, the dashboard remains responsive across all synchronized client instances.</p>
+        </div>
+        <div class="page-footer-container">18</div>
+    </div>
+
+    <div class="page">
+        <div class="page-border"></div>
+        <div class="page-header">BACKEND SYSTEM ARCHITECTURE</div>
+        <h2>3.5 BACKEND API ARCHITECTURE</h2>
+        <div class="content-body">
+            <p>The backend architecture of Sliq is designed as a modular, stateless micro-service layer that orchestrates data flow between the MongoDB persistence layer and the real-time Socket.io gateway. This architecture ensures high availability and allows for horizontal scaling by decoupling the collaborative event logic from the standard CRUD operations.</p>
+            <div class="diagram-container">
+                <div class="mermaid">
+                    graph TD
+                        Req[Incoming Request] --&gt; Guard[Auth Middleware - JWT]
+                        Guard --&gt; Route{Express Router}
+                        Route -- Auth --&gt; AC[Auth Controller]
+                        Route -- Workspace --&gt; WC[Workspace Controller]
+                        Route -- Task --&gt; TC[Task Controller]
+                        
+                        AC &amp; WC &amp; TC --&gt; Service[Business Logic Layer]
+                        Service --&gt; Mongoose[Mongoose Model / ODM]
+                        Mongoose --&gt; DB[(MongoDB Atlas)]
+                        
+                        Service -- "Success Event" --&gt; Socket[Socket.io Gateway]
+                        Socket -- "Broadcast" --&gt; Clients[Target Workspace Clients]
+                </div>
+            </div>
+            <p>Every state-changing request (POST/PUT/DELETE) first undergoes strict schema validation via Mongoose. Upon successful database mutation, the Service layer triggers a specific WebSocket event (e.g., <code>TASK_UPDATED</code>) addressed to the specific <code>workspaceId</code> room. This ensures that only members of the relevant workspace receive the real-time updates, maintaining multi-tenant data isolation.</p>
+            <p>We have also implemented a custom error-handling middleware that catches asynchronous exceptions and returns standardized JSON responses, significantly improving the developer experience during frontend debugging and reducing the risk of server crashes due to unhandled rejections.</p>
+        </div>
+        <div class="page-footer-container">19</div>
+    </div>
+
+    <!-- CHAPTER 4: IMPLEMENTATION & SCREENSHOTS -->
+    <div class="page chapter-start">
+        <div class="page-border"></div>
+        
+        <div class="chapter-jump">
+            <div class="chapter-label">CHAPTER 4</div>
+            <div class="chapter-main-title">IMPLEMENTATION &amp; SCREENSHOTS</div>
+        </div>
+        
+    </div>
+
+    <div class="page">
+        <div class="page-border"></div>
+        <div class="page-header">SYSTEM IMPLEMENTATION</div>
+        <h2>4.1 SOCKET.IO VS REST IMPLEMENTATION</h2>
+        <div class="content-body">
+            <p>Sliq employs a hybrid communication strategy. While standard CRUD operations use RESTful API endpoints, all collaborative features use WebSockets via Socket.io.</p>
+            <h3>4.1.1 Kanban Sync Logic</h3>
+            <p>When a developer moves a task card, the frontend emits a 'move_task' event. The backend processes this and broadcasts to the workspace room.</p>
+            <div class="diagram-container">
+                <div class="mermaid">
+                    sequenceDiagram
+                        Developer-&gt;&gt;Server: emit 'task_moved' (taskId, newStatus)
+                        Server-&gt;&gt;DB: Update Task Status
+                        Server-&gt;&gt;Other_Devs: broadcast 'refresh'
+                </div>
+            </div>
+            <h3>4.1.2 State Management</h3>
+            <p>The frontend uses React Context API (WorkspaceContext) to manage global state without prop-drilling, ensuring real-time updates are seamless.</p>
+        </div>
+        <div class="page-footer-container">21</div>
+    </div>
+
+    <!-- ADDED MISSING FLOWCHART: IMPLEMENTATION LOGIC -->
+    <div class="page">
+        <div class="page-border"></div>
+        <div class="page-header">SYSTEM DESIGN &amp; ARCHITECTURE</div>
+        <h2 style="text-align: center;">4.2 REAL-TIME SYNC FLOWCHART</h2>
+        <div class="content-body">
+            <p>The operational logic for real-time task synchronization follows a strict vertical flow to ensure data integrity across multi-tenant workspaces.</p>
+            <div class="diagram-container">
+                <div class="mermaid">
+                    graph TD
+                    A[User Drags Task Card] --&gt; B[Frontend Emits 'task_moved']
+                    B --&gt; C[Server Validates Session]
+                    C --&gt; D[Update MongoDB Status]
+                    D --&gt; E[Server Emits Broadcast]
+                    E --&gt; F[Other Clients Update UI]
+                    F --&gt; G[Sync Complete]
+                </div>
+            </div>
+            <p class="figure-caption" style="margin-bottom: 0;">Figure 4.1: Real-time Task Synchronization Flow</p>
+        </div>
+        <div class="page-footer-container">22</div>
+    </div>
+
+    <!-- SCREENSHOTS -->
+    <div class="page">
+        <div class="page-border"></div>
+        <div class="page-header">SYSTEM SCREENSHOTS [1/4]</div>
+        <h2>4.2 DEVELOPER DASHBOARD</h2>
+        <div class="content-body" style="text-align: center;">
+            <p style="text-align: justify; margin-bottom: 5pt;">The Developer Dashboard provides a high-level view of active tasks, recent notifications, and the upcoming meeting schedule.</p>
+            <img src="/Users/yash/Desktop/Home/sliq/images/developer/dashboard.png" class="screenshot" alt="Developer Dashboard" style="max-height: 60mm; margin: 10pt 0;">
+            <p class="figure-caption" style="margin-bottom: 0;">Figure 4.2: Developer Dashboard Interface</p>
+            
+            <h2 style="margin-top: 5pt;">4.3 INTERACTIVE KANBAN BOARD</h2>
+            <p style="text-align: justify; margin-bottom: 5pt;">The Kanban board features draggable task cards that update in real-time across all client sessions using the @dnd-kit library.</p>
+            <img src="/Users/yash/Desktop/Home/sliq/images/developer/kanban_board.png" class="screenshot" alt="Kanban Board" style="max-height: 60mm; margin: 10pt 0;">
+            <p class="figure-caption" style="margin-bottom: 0;">Figure 4.3: Real-time Kanban Task Management</p>
+        </div>
+        <div class="page-footer-container">23</div>
+    </div>
+
+    <div class="page">
+        <div class="page-border"></div>
+        <div class="page-header">SYSTEM SCREENSHOTS [3/4]</div>
+        <h2>4.4 PROJECT ANALYTICS</h2>
+        <div class="content-body" style="text-align: center;">
+            <p style="text-align: justify; margin-bottom: 5pt;">Managers can view productivity metrics, illustrating task completion rates and member performance over time using interactive Recharts components.</p>
+            <img src="/Users/yash/Desktop/Home/sliq/images/manager/analytics.png" class="screenshot" alt="Manager Analytics" style="max-height: 60mm; margin: 10pt 0;">
+            <p class="figure-caption" style="margin-bottom: 0;">Figure 4.4: Project Productivity Workspace Analytics</p>
+
+            <h2 style="margin-top: 5pt;">4.5 VIDEO CONFERENCING &amp; MEETINGS</h2>
+            <p style="text-align: justify; margin-bottom: 5pt;">The meeting system integrates with Jitsi Video. Scheduling a meeting automatically notifies all relevant workspace members.</p>
+            <img src="/Users/yash/Desktop/Home/sliq/images/manager/meetings.png" class="screenshot" alt="Meetings Interface" style="max-height: 60mm; margin: 10pt 0;">
+            <p class="figure-caption" style="margin-bottom: 0;">Figure 4.5: Collaboration Meeting Scheduler</p>
+        </div>
+        <div class="page-footer-container">24</div>
+    </div>
+
+    <!-- CHAPTER 5: TESTING CHAPTER PAGE -->
+    <div class="page chapter-start">
+        <div class="page-border"></div>
+        
+        <div class="chapter-jump">
+            <div class="chapter-label">CHAPTER 5</div>
+            <div class="chapter-main-title">TESTING &amp; QA</div>
+        </div>
+        
+    </div>
+
+    <div class="page">
+        <div class="page-border"></div>
+        <div class="page-header">TESTING &amp; QUALITY ASSURANCE</div>
+        <h2>5.1 UNIT TESTING STRATEGY</h2>
+        <div class="content-body">
+            <p>Sliq underwent a multi-tier testing protocol. Below is the primary set of unit and integration test cases executed during the final QA phase.</p>
+            <table>
+                <tbody><tr><th style="width: 15%;">ID</th><th style="width: 20%;">Module</th><th style="width: 45%;">Scenario</th><th>Result</th></tr>
+                <tr><td>TC-01</td><td>Auth</td><td>Login with correct credentials</td><td>Pass</td></tr>
+                <tr><td>TC-02</td><td>Auth</td><td>Login with incorrect password</td><td>Pass</td></tr>
+                <tr><td>TC-03</td><td>Workspace</td><td>Create WS without name</td><td>Pass</td></tr>
+                <tr><td>TC-04</td><td>Board</td><td>Drag task to 'Done' column</td><td>Pass</td></tr>
+                <tr><td>TC-05</td><td>Socket</td><td>Disconnect during task move</td><td>Pass</td></tr>
+                <tr><td>TC-06</td><td>Meetings</td><td>Join with invalid RoomID</td><td>Pass</td></tr>
+                <tr><td>TC-07</td><td>Admin</td><td>Promote Developer to Manager</td><td>Pass</td></tr>
+                <tr><td>TC-08</td><td>Project</td><td>Delete active project</td><td>Pass</td></tr>
+            </tbody></table>
+        </div>
+        <div class="page-footer-container">26</div>
+    </div>
+
+    <div class="page">
+        <div class="page-border"></div>
+        <div class="page-header">TESTING &amp; QUALITY ASSURANCE</div>
+        <div class="content-body">
+            <table>
+                <tbody><tr><th style="width: 15%;">ID</th><th style="width: 20%;">Module</th><th style="width: 45%;">Scenario</th><th>Result</th></tr>
+                <tr><td>TC-09</td><td>Analytics</td><td>Empty project chart view</td><td>Pass</td></tr>
+                <tr><td>TC-10</td><td>Security</td><td>Access API without Token</td><td>Pass</td></tr>
+                <tr><td>TC-11</td><td>Performance</td><td>Large JSON payload (5MB)</td><td>Pass</td></tr>
+                <tr><td>TC-12</td><td>UI/UX</td><td>Mobile viewport scaling</td><td>Pass</td></tr>
+                <tr><td>TC-13</td><td>Database</td><td>Mongoose Schema validation</td><td>Pass</td></tr>
+                <tr><td>TC-14</td><td>Search</td><td>Search non-existent task</td><td>Pass</td></tr>
+                <tr><td>TC-15</td><td>Notification</td><td>Real-time alert on assignment</td><td>Pass</td></tr>
+            </tbody></table>
+        </div>
+        <div class="page-footer-container">27</div>
+    </div>
+
+    <div class="page">
+        <div class="page-border"></div>
+        <div class="page-header">TESTING &amp; QUALITY ASSURANCE</div>
+        <h2>5.2 TESTING ENVIRONMENT &amp; QA PROCESS</h2>
+        <div class="content-body">
+            <p>Quality Assurance was integrated into the development lifecycle via a local CI/CD simulation. We employed a "Test-Driven Lite" approach where core API endpoints were validated against expected JSON outputs before the frontend components were integrated.</p>
+            <div class="diagram-container">
+                <div class="mermaid">
+                    graph TD
+                    A[Code Completion] --&gt; B[Unit Testing]
+                    B --&gt; C{Tests Pass?}
+                    C -- No --&gt; D[Bug Fix Iteration]
+                    D --&gt; B
+                    C -- Yes --&gt; E[Integration Testing]
+                    E --&gt; F[User Acceptance]
+                    F --&gt; G[Final Documentation]
+                </div>
+            </div>
+            <p class="figure-caption" style="margin-bottom: 5pt;">Figure 5.1: Quality Assurance &amp; Testing Workflow</p>
+            <h3>5.2.1 Environment Setup</h3>
+            <p>A separate `sliq_test` database was utilized to prevent corruption of the development data. <b>Postman</b> was used for automated API collection testing, ensuring that all 20+ endpoints returned consistent HTTP status codes under various load conditions.</p>
+            <h3>5.2.2 User Acceptance Testing (UAT)</h3>
+            <p>The system was presented to a group of 5 peer developers who performed real-world tasks including cross-workspace task movement and live video meeting creation. 100% of participants found the real-time syncing "highly responsive" and the interface "easy to navigate". Feedback from these sessions led to the refinement of our dashboard analytics, replacing static tables with dynamic Recharts visualizations for better data clarity.</p>
+            <p>The final QA audit verified that the system maintains A4-compliance in its documentation and satisfies all security requirements defined in Chapter 2, including successful Bcrypt hashing and JWT token expiration checks.</p>
+        </div>
+        <div class="page-footer-container">28</div>
+    </div>
+
+    <!-- CONCLUSION -->
+    <div class="page">
+        <div class="page-border"></div>
+        <div class="page-header">PROJECT CONCLUSION</div>
+        <h2 style="text-align: center;">CONCLUSION</h2>
+        <div class="content-body">
+            <p>The development of <b>Sliq</b> has been a comprehensive journey into the complexities of real-time application design and enterprise project management. By leveraging the MERN stack alongside Socket.io and Jitsi, we have created a platform that is not only functional but also reflects the high-performance standards required in modern engineering environments.</p>
+            <p>Throughout the project lifecycle, we successfully balanced technical requirements—such as database scaling and event-driven synchronization—with user-centric goals like intuitive navigation and aesthetic excellence. The integration of Framer Motion for animations and Recharts for analytics has transformed the platform from a utility tool into a high-fidelity user experience.</p>
+            <p class="no-indent"><b>Key Takeaways:</b></p>
+            <ul>
+                <li>Successfully implemented full-duplex communication for immediate task updates.</li>
+                <li>Maintained strict A4-formatted academic documentation alongside a production-ready codebase.</li>
+                <li>Architected a multi-tenant workspace model ensuring data privacy and organizational hierarchy.</li>
+            </ul>
+            <p class="no-indent"><b>Future Scope:</b> Moving forward, we plan to integrate AI-powered task estimation and automated CI/CD pipeline tracking directly in the dashboard. We also aim to expand the analytical reports to include machine-learning-based productivity forecasting, allowing managers to predict project completion timelines with higher accuracy.</p>
+            <p>In conclusion, Sliq demonstrates the power of modern JavaScript ecosystems in solving traditional workplace inefficiencies, providing a solid foundation for further research into collaborative software engineering tools.</p>
+        </div>
+        <div class="page-footer-container">29</div>
+    </div>
+
+    <!-- BIBLIOGRAPHY -->
+    <div class="page">
+        <div class="page-border"></div>
+        <div class="page-header-text">PROJECT REPORT - SLIQ: MODERN PROJECT MANAGEMENT PLATFORM</div>
+        <h2 style="text-align: center;">BIBLIOGRAPHY</h2>
+        <div class="content-body" style="margin-top: 15mm;">
+            <p style="text-indent: 0;">1. <b>React Documentation</b>: <i>react.dev</i> - Understanding hooks and concurrent rendering.</p>
+            <p style="text-indent: 0;">2. <b>MongoDB University</b>: <i>mongodb.com/academy</i> - Data modeling for MERN applications.</p>
+            <p style="text-indent: 0;">3. <b>Socket.io Manual</b>: <i>socket.io/docs</i> - Scaling WebSocket servers.</p>
+            <p style="text-indent: 0;">4. <b>Tailwind CSS Styling</b>: <i>tailwindcss.com</i> - Utility-first CSS architecture.</p>
+            <p style="text-indent: 0;">5. <b>Modern Web Security</b>: <i>auth0.com/blog</i> - JWT implementation best practices.</p>
+        </div>
+        <div class="page-footer-container">30</div>
+    </div>
+
+    <script>
+        function updatePageNumbers() {
+            // Note: In browser viewing, we use simple counter.
+            // In Print, the CSS handles it via @page or counter-increment.
+        }
+    </script>
+
+
+</body></html>
