@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Send, User, Calendar, Tag, Trash2, Clock, CheckCircle2 } from 'lucide-react';
+import { X, Send, User, Calendar, Tag, Trash2, Clock, CheckCircle2, Plus } from 'lucide-react';
 import { taskAPI, commentAPI } from '../services/api';
 import socket from '../services/socket';
 
