@@ -122,6 +122,12 @@ const MeetingsPage = () => {
                       Project: {meeting.project.name}
                     </div>
                   )}
+                  {meeting.task && (
+                    <div className="flex items-center gap-3 text-sm font-bold text-amber-600">
+                      <List size={16} />
+                      Task: {meeting.task.title}
+                    </div>
+                  )}
                   {meeting.workspace && (
                     <div className="flex items-center gap-3 text-sm font-bold text-emerald-600">
                       <LayoutIcon size={16} />
@@ -167,6 +173,7 @@ const MeetingsPage = () => {
             { header: 'Context', accessor: 'project', cell: (row) => (
               <div className="flex flex-col gap-1">
                 {row.project && <span className="text-[10px] font-black uppercase tracking-widest text-indigo-500 bg-indigo-50 px-2 py-1 rounded-md inline-block">Pro: {row.project.name}</span>}
+                {row.task && <span className="text-[10px] font-black uppercase tracking-widest text-amber-500 bg-amber-50 px-2 py-1 rounded-md inline-block">Task: {row.task.title}</span>}
                 {row.workspace && <span className="text-[10px] font-black uppercase tracking-widest text-emerald-500 bg-emerald-50 px-2 py-1 rounded-md inline-block">Wk: {row.workspace.name}</span>}
               </div>
             )},

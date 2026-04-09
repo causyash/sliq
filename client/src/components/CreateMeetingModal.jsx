@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { X, Calendar as CalendarIcon, Clock, Type, AlignLeft, Briefcase, Layout as LayoutIcon } from 'lucide-react';
-import { meetingAPI, projectAPI, workspaceAPI } from '../services/api';
+import { X, Calendar as CalendarIcon, Clock, Type, AlignLeft, Briefcase, Layout as LayoutIcon, CheckSquare } from 'lucide-react';
+import { meetingAPI, projectAPI, workspaceAPI, taskAPI } from '../services/api';
 
 const CreateMeetingModal = ({ onClose, onSuccess, initialDate, defaultProjectId, defaultWorkspaceId }) => {
   const formatDate = (date) => {
@@ -17,15 +17,19 @@ const CreateMeetingModal = ({ onClose, onSuccess, initialDate, defaultProjectId,
     date: initialDate ? formatDate(initialDate) : formatDate(new Date()),
     time: '12:00',
     project: defaultProjectId || '',
-    workspace: defaultWorkspaceId || ''
+    workspace: defaultWorkspaceId || '',
+    task: ''
   });
   
   const [projects, setProjects] = useState([]);
   const [workspaces, setWorkspaces] = useState([]);
+  const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(false);
   const [fetchingOptions, setFetchingOptions] = useState(true);
+  const [fetchingTasks, setFetchingTasks] = useState(false);
   const [error, setError] = useState('');
 
+  // Initial fetch of workspaces and all relevant projects
   useEffect(() => {
     const fetchOptions = async () => {
       try {
@@ -44,8 +48,40 @@ const CreateMeetingModal = ({ onClose, onSuccess, initialDate, defaultProjectId,
     fetchOptions();
   }, []);
 
+  // Fetch tasks when project changes
+  useEffect(() => {
+    const fetchTasks = async () => {
+      if (!formData.project) {
+        setTasks([]);
+        return;
+      }
+
+      setFetchingTasks(true);
+      try {
+        const { data } = await taskAPI.getByProject(formData.project);
+        setTasks(data);
+      } catch (err) {
+        console.error('Failed to fetch tasks for project', err);
+        setTasks([]);
+      } finally {
+        setFetchingTasks(false);
+      }
+    };
+
+    fetchTasks();
+  }, [formData.project]);
+
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    
+    // Reset secondary selections when parent selection changes
+    if (name === 'workspace') {
+      setFormData(prev => ({ ...prev, [name]: value, project: '', task: '' }));
+    } else if (name === 'project') {
+      setFormData(prev => ({ ...prev, [name]: value, task: '' }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -68,11 +104,11 @@ const CreateMeetingModal = ({ onClose, onSuccess, initialDate, defaultProjectId,
 
     setLoading(true);
     try {
-      // Basic sanitization: send null if empty strings
       const payload = {
         ...formData,
         project: formData.project || undefined,
-        workspace: formData.workspace || undefined
+        workspace: formData.workspace || undefined,
+        task: formData.task || undefined
       };
       await meetingAPI.create(payload);
       onSuccess();
@@ -83,6 +119,11 @@ const CreateMeetingModal = ({ onClose, onSuccess, initialDate, defaultProjectId,
       setLoading(false);
     }
   };
+
+  // Filter projects by workspace if one is selected
+  const visibleProjects = formData.workspace 
+    ? projects.filter(p => p.workspace && (p.workspace._id === formData.workspace || p.workspace === formData.workspace))
+    : projects;
 
   return (
     <div className="fixed inset-0 bg-gray-900/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
@@ -110,7 +151,7 @@ const CreateMeetingModal = ({ onClose, onSuccess, initialDate, defaultProjectId,
             </div>
           )}
 
-          <div className="space-y-4">
+          <div className="space-y-4 max-h-[60vh] overflow-y-auto px-1">
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-2">Meeting Title</label>
               <div className="relative">
@@ -139,14 +180,14 @@ const CreateMeetingModal = ({ onClose, onSuccess, initialDate, defaultProjectId,
                   name="description"
                   value={formData.description}
                   onChange={handleChange}
-                  rows="3"
+                  rows="2"
                   className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-sm font-medium text-gray-900 placeholder-gray-400 resize-none"
                   placeholder="Agenda and details..."
                 />
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4">
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-2">Workspace <span className="text-gray-400 font-normal">(Optional)</span></label>
                 <div className="relative">
@@ -168,24 +209,47 @@ const CreateMeetingModal = ({ onClose, onSuccess, initialDate, defaultProjectId,
                 </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">Project <span className="text-gray-400 font-normal">(Optional)</span></label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                    <Briefcase size={18} />
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">Project <span className="text-gray-400 font-normal">(Optional)</span></label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                      <Briefcase size={18} />
+                    </div>
+                    <select
+                      name="project"
+                      value={formData.project}
+                      onChange={handleChange}
+                      className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all font-medium text-gray-900 appearance-none"
+                      disabled={fetchingOptions}
+                    >
+                      <option value="">Choose Project</option>
+                      {visibleProjects.map(p => (
+                        <option key={p._id} value={p._id}>{p.name}</option>
+                      ))}
+                    </select>
                   </div>
-                  <select
-                    name="project"
-                    value={formData.project}
-                    onChange={handleChange}
-                    className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all font-medium text-gray-900 appearance-none"
-                    disabled={fetchingOptions}
-                  >
-                    <option value="">Choose Project</option>
-                    {projects.map(p => (
-                      <option key={p._id} value={p._id}>{p.name}</option>
-                    ))}
-                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">Task <span className="text-gray-400 font-normal">(Optional)</span></label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                      <CheckSquare size={18} />
+                    </div>
+                    <select
+                      name="task"
+                      value={formData.task}
+                      onChange={handleChange}
+                      className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all font-medium text-gray-900 appearance-none"
+                      disabled={!formData.project || fetchingTasks}
+                    >
+                      <option value="">{formData.project ? 'Choose Task' : 'Select Project First'}</option>
+                      {tasks.map(t => (
+                        <option key={t._id} value={t._id}>{t.title}</option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
               </div>
             </div>
@@ -255,3 +319,4 @@ const CreateMeetingModal = ({ onClose, onSuccess, initialDate, defaultProjectId,
 };
 
 export default CreateMeetingModal;
+

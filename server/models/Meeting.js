@@ -35,6 +35,10 @@ const meetingSchema = new mongoose.Schema({
   workspace: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Workspace'
+  },
+  task: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Task'
   }
 }, {
   timestamps: true

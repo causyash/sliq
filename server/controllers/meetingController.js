@@ -8,7 +8,7 @@ const crypto = require('crypto');
 
 exports.createMeeting = async (req, res) => {
   try {
-    const { title, description, date, time, project, workspace } = req.body;
+    const { title, description, date, time, project, workspace, task } = req.body;
     
     // Generate a unique room ID for Jitsi
     const shortId = crypto.randomUUID().substring(0, 8);
@@ -22,7 +22,8 @@ exports.createMeeting = async (req, res) => {
       roomId,
       organizer: req.user._id,
       project: project || undefined,
-      workspace: workspace || undefined
+      workspace: workspace || undefined,
+      task: task || undefined
     });
 
     const savedMeeting = await newMeeting.save();
@@ -31,6 +32,7 @@ exports.createMeeting = async (req, res) => {
     await savedMeeting.populate('organizer', 'name email');
     if (savedMeeting.project) await savedMeeting.populate('project', 'name');
     if (savedMeeting.workspace) await savedMeeting.populate('workspace', 'name');
+    if (savedMeeting.task) await savedMeeting.populate('task', 'title');
 
     // Notification Logic: Notify everyone in the workspace/project OR all developers
     let recipientIds = [];
@@ -78,6 +80,7 @@ exports.getMeetings = async (req, res) => {
       .populate('organizer', 'name email')
       .populate('project', 'name')
       .populate('workspace', 'name')
+      .populate('task', 'title')
       .sort({ date: 1, time: 1 });
 
     res.json(meetings);
