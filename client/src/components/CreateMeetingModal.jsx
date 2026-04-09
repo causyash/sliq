@@ -57,6 +57,15 @@ const CreateMeetingModal = ({ onClose, onSuccess, initialDate, defaultProjectId,
       return;
     }
 
+    const selectedDate = new Date(formData.date);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (selectedDate < today) {
+      setError('Meeting date cannot be in the past');
+      return;
+    }
+
     setLoading(true);
     try {
       // Basic sanitization: send null if empty strings
