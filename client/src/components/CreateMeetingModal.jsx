@@ -193,6 +193,7 @@ const CreateMeetingModal = ({ onClose, onSuccess, initialDate, defaultProjectId,
                     name="date"
                     value={formData.date}
                     onChange={handleChange}
+                    min={formatDate(new Date())}
                     className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all font-medium text-gray-900"
                     required
                   />

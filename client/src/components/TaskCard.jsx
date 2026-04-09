@@ -48,7 +48,7 @@ const TaskCard = ({ task, onClick }) => {
       style={style}
       {...attributes}
       {...listeners}
-      onClick={() => onClick(task)}
+      onClick={() => onClick && onClick(task)}
       layout
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
