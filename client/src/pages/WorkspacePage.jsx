@@ -5,7 +5,6 @@ import { workspaceAPI, projectAPI } from '../services/api';
 import Layout from '../components/Layout';
 import ProjectCard from '../components/ProjectCard';
 import CreateProjectModal from '../components/CreateProjectModal';
-import CreateProjectModal from '../components/CreateProjectModal';
 import CreateMeetingModal from '../components/CreateMeetingModal';
 import DataTable from '../components/DataTable';
 
