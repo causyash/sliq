@@ -386,6 +386,7 @@ const ProjectPage = () => {
         <CreateTaskModal 
           projectId={id}
           workspaceId={project.workspaceId?._id}
+          projectMembers={project.members}
           initialStatus={initialStatus}
           onClose={() => setIsCreateModalOpen(false)}
           onSuccess={() => {

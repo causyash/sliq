@@ -2,31 +2,27 @@ import React, { useState, useEffect } from 'react';
 import { X, Calendar, AlertCircle } from 'lucide-react';
 import { taskAPI, workspaceAPI } from '../services/api';
 
-const CreateTaskModal = ({ projectId, workspaceId, initialStatus, onClose, onSuccess }) => {
+const CreateTaskModal = ({ projectId, workspaceId, projectMembers, initialStatus, onClose, onSuccess }) => {
+  const developers = (projectMembers || []).filter(m => m.role === 'developer');
+
   const [formData, setFormData] = useState({
     title: '',
     description: '',
     projectId: projectId,
-    assignee: '',
+    assignee: developers.length > 0 ? developers[0]._id : '',
     priority: 'medium',
     dueDate: '',
     status: initialStatus || 'todo'
   });
-  const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  // Automatically update assignee if developers change (though unlikely in modal lifecycle)
   useEffect(() => {
-    const fetchMembers = async () => {
-      try {
-        const { data } = await workspaceAPI.getById(workspaceId);
-        setMembers(data.members || []);
-      } catch (err) {
-        console.error('Failed to fetch members', err);
-      }
-    };
-    if (workspaceId) fetchMembers();
-  }, [workspaceId]);
+    if (developers.length > 0 && !formData.assignee) {
+      setFormData(prev => ({ ...prev, assignee: developers[0]._id }));
+    }
+  }, [projectMembers]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -83,12 +79,10 @@ const CreateTaskModal = ({ projectId, workspaceId, initialStatus, onClose, onSuc
                   onChange={(e) => setFormData({...formData, assignee: e.target.value})}
                   className="w-full px-5 py-3.5 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all text-sm font-bold text-gray-700"
                 >
-                  <option value="">Unassigned</option>
-                  {members
-                    .filter(member => member.role === 'developer')
-                    .map(member => (
-                      <option key={member._id} value={member._id}>{member.name}</option>
-                    ))}
+                  {developers.length === 0 && <option value="">Unassigned</option>}
+                  {developers.map(member => (
+                    <option key={member._id} value={member._id}>{member.name}</option>
+                  ))}
                 </select>
               </div>
 
