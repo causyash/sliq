@@ -175,7 +175,7 @@ const AdminProjectList = () => {
               <div className="p-4 max-h-[400px] overflow-y-auto">
                 <div className="space-y-2">
                   {users
-                    .filter(u => u.role === 'developer' && !selectedProject?.members.some(m => m._id === u._id))
+                    .filter(u => (u.role === 'developer' || u.role === 'project_manager') && !selectedProject?.members.some(m => m._id === u._id))
                     .map(user => (
                     <button 
                       key={user._id}
