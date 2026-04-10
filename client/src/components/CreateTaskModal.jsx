@@ -3,13 +3,13 @@ import { X, Calendar, AlertCircle } from 'lucide-react';
 import { taskAPI, workspaceAPI } from '../services/api';
 
 const CreateTaskModal = ({ projectId, workspaceId, projectMembers, initialStatus, onClose, onSuccess }) => {
-  const assignees = (projectMembers || []).filter(m => m.role === 'developer' || m.role === 'project_manager');
+  const developers = (projectMembers || []).filter(m => m.role === 'developer');
 
   const [formData, setFormData] = useState({
     title: '',
     description: '',
     projectId: projectId,
-    assignee: assignees.length > 0 ? assignees[0]._id : '',
+    assignee: developers.length > 0 ? developers[0]._id : '',
     priority: 'medium',
     dueDate: '',
     status: initialStatus || 'todo'
@@ -17,10 +17,10 @@ const CreateTaskModal = ({ projectId, workspaceId, projectMembers, initialStatus
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Automatically update assignee if members change
+  // Automatically update assignee if developers change
   useEffect(() => {
-    if (assignees.length > 0 && !formData.assignee) {
-      setFormData(prev => ({ ...prev, assignee: assignees[0]._id }));
+    if (developers.length > 0 && !formData.assignee) {
+      setFormData(prev => ({ ...prev, assignee: developers[0]._id }));
     }
   }, [projectMembers]);
 
@@ -79,8 +79,8 @@ const CreateTaskModal = ({ projectId, workspaceId, projectMembers, initialStatus
                   onChange={(e) => setFormData({...formData, assignee: e.target.value})}
                   className="w-full px-5 py-3.5 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all text-sm font-bold text-gray-700"
                 >
-                  {assignees.length === 0 && <option value="">Unassigned</option>}
-                  {assignees.map(member => (
+                  {developers.length === 0 && <option value="">Unassigned</option>}
+                  {developers.map(member => (
                     <option key={member._id} value={member._id}>{member.name}</option>
                   ))}
                 </select>
